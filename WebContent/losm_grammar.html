@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="product" content="Metro UI CSS Framework">
+    <meta name="description" content="Simple responsive css framework">
+    <meta name="author" content="Sergey S. Pimenov, Ukraine, Kiev">
+    <meta name="keywords" content="js, css, metro, framework, windows 8, metro ui">
+
+    <link href="css/metro-bootstrap.css" rel="stylesheet">
+    <link href="css/metro-bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/iconFont.css" rel="stylesheet">
+    <link href="css/docs.css" rel="stylesheet">
+    <link href="js/prettify/prettify.css" rel="stylesheet">
+
+    <!-- Load JavaScript Libraries -->
+    <script src="js/jquery/jquery.min.js"></script>
+    <script src="js/jquery/jquery.widget.min.js"></script>
+    <script src="js/jquery/jquery.mousewheel.js"></script>
+    <script src="js/prettify/prettify.js"></script>
+
+    <!-- Metro UI CSS JavaScript plugins -->
+    <script src="js/load-metro.js"></script>
+
+    <!-- Local JavaScript -->
+    <script src="js/docs.js"></script>
+    <script src="js/github.info.js"></script>
+
+    <title>LOSM: Linked Open Street Map [beta version]</title>
+
+    <style>
+    </style>
+</head>
+<body class="metro" style="background-color: #fdfbfb;">
+    <!-- <header class="bg-dark" data-load="header.html"></header>-->
+
+    <div class="">
+        <div style="background: url(images/21454.jpg) top left no-repeat; background-size: cover; height: 400px;">
+            <div class="container" style="padding: 50px 20px">
+                <h1 class="fg-white"><a href="/semanticweb/lod/losm/" style="color:#fff">LOSM: Linked Open Street Map <sup>beta version</sup></a></h1>
+                <h2 class="fg-white">
+                    A new service to query OpenstreetMap<br /> through a clear Sparql endpoint.
+                </h2>
+
+    <!--            <a href="https://github.com/olton/Metro-UI-CSS/archive/master.zip"
+                   class="place-left button bg-darkRed bg-hover-red fg-white fg-hover-white bd-orange" style="margin-top: 10px">
+                    <h3 style="margin: 10px 40px">Download <span class="icon-download-2 on-right"></span></h3>-->
+                </a>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="grid fluid">
+                <div class="row">
+                    <div class="span4  padding20 text-center" style="background-color:#26a;">
+                        <h2 class="fg-white"><a href="/semanticweb/lod/losm/" style="color:#fff">easy to use</a></h2>
+                    </div>
+                    <div class="span4 bg-lighterBlue padding20 text-center">
+                        <h2 class="fg-white"><a href="/semanticweb/lod/losm/demo.html" style="color:#fff"><strong>Try it Now!</strong></a></h2>
+                    </div>
+                    <div class="span4  padding20 text-center"  style="background-color:#26a;">
+                        <h2 class="fg-white"><a href="/semanticweb/lod/losm/contacts.html" style="color:#fff">contacts</a></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="width:100%;">
+            <div class="grid no-margin" style="width:100%;">
+                <div class="row" style="width:100%;">
+                    
+                    <div style="width:100%;">
+                       <p>This page is intended to explain the detailed subset of sparql grammar used in this demo. <br />
+                       The productions for terminals are omitted because they were fully implemented as described in <a href="http://www.w3.org/TR/sparql11-query/#sparqlGrammar" target="_blank">sparql specifications</a><br />
+                       The productions for non-terminals listed below are a modified subset of the standard sparql ones.<br />
+                       We kept the original numbers to make the comparison simple.<br />
+                       It is a subset because we decided to build the scanner/parser and the translator from scratch so it is a work in progress.<br />
+                       It is a modified subset basically for two reasons:<br />
+                       - A reduced grammar has to be modified to be consistent<br />
+                       - We inserted Parameter and ParameterList productions to get parameters of jena spatial function using the same way as GeoSparql does.<br />
+                       <br />
+                       Finally the below productions are parsed but some of them are not translated because they can be intended in different ways and we are evaluating the best translation of them before uploading extended versions of this demo.<br />
+                       For a reference of the stable features implemented and the functions you can use, you should refer to <a href="/semanticweb/lod/losm/demo.html" target="_blank">editor and example page</a> <br />
+                       <br />
+                       Productions for non-terminals:</p>
+                
+						<table>
+						    <tbody>
+						        <tr valign="baseline">
+						            <td><code>[1]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rQueryUnit" name="rQueryUnit">QueryUnit</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rQuery">Query</a> <span class="token"></span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[2]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rQuery" name="rQuery">Query</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPrologue">Prologue</a> <a href="#rSelectQuery">SelectQuery</a>?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[3]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rUpdateUnit" name="rUpdateUnit">UpdateUnit</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rUpdate">Update</a> <span class="token"></span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[4]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPrologue" name="rPrologue">Prologue</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>( <a href="#rBaseDecl">BaseDecl</a> | <a href="#rPrefixDecl">PrefixDecl</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[5]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBaseDecl" name="rBaseDecl">BaseDecl</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'BASE'</span> <a href="#rIRIREF">IRIREF</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[6]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPrefixDecl" name="rPrefixDecl">PrefixDecl</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'PREFIX'</span> <a href="#rPNAME_NS">PNAME_NS</a> <a href="#rIRIREF">IRIREF</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[7]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rSelectQuery" name="rSelectQuery">SelectQuery</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rSelectClause">SelectClause</a> <a href="#rWhereClause">WhereClause</a> <a href="#rSolutionModifier">SolutionModifier</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[8]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rSubSelect" name="rSubSelect">SubSelect</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rSelectClause">SelectClause</a> <a href="#rWhereClause">WhereClause</a> <a href="#rSolutionModifier">SolutionModifier</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[9]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rSelectClause" name="rSelectClause">SelectClause</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'SELECT'</span> <span class="token">'DISTINCT'</span>? ( ( <a href="#rVar">Var</a> | ( <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">'AS'</span> <a href="#rVar">Var</a> <span class="token">')'</span> ) )+ | <span class="token">'*'</span> )</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[17]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rWhereClause" name="rWhereClause">WhereClause</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'WHERE'</span>? <a href="#rGroupGraphPattern">GroupGraphPattern</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[18]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rSolutionModifier" name="rSolutionModifier">SolutionModifier</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rOrderClause">OrderClause</a>? <a href="#rLimitOffsetClauses">LimitOffsetClauses</a>?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[23]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rOrderClause" name="rOrderClause">OrderClause</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'ORDER'</span> <span class="token">'BY'</span> <a href="#rOrderCondition">OrderCondition</a>+</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[24]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rOrderCondition" name="rOrderCondition">OrderCondition</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>   ( ( <span class="token">'ASC'</span> | <span class="token">'DESC'</span> ) <a href="#rBrackettedExpression">BrackettedExpression</a> )<br>| ( <a href="#rConstraint">Constraint</a> | <a href="#rVar">Var</a> ) </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[25]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rLimitOffsetClauses" name="rLimitOffsetClauses">LimitOffsetClauses</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rLimitClause">LimitClause</a> <a href="#rOffsetClause">OffsetClause</a>? | <a href="#rOffsetClause">OffsetClause</a> <a href="#rLimitClause">LimitClause</a>? </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[26]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rLimitClause" name="rLimitClause">LimitClause</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'LIMIT'</span> <a href="#rINTEGER">INTEGER</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[27]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rOffsetClause" name="rOffsetClause">OffsetClause</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'OFFSET'</span> <a href="#rINTEGER">INTEGER</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[53]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGroupGraphPattern" name="rGroupGraphPattern">GroupGraphPattern</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'{'</span> ( <a href="#rSubSelect">SubSelect</a> | <a href="#rGroupGraphPatternSub">GroupGraphPatternSub</a> ) <span class="token">'}'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[54]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGroupGraphPatternSub" name="rGroupGraphPatternSub">GroupGraphPatternSub</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rTriplesBlock">TriplesBlock</a>? ( <a href="#rGraphPatternNotTriples">GraphPatternNotTriples</a> <span class="token">'.'</span>? <a href="#rTriplesBlock">TriplesBlock</a>? )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[55]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rTriplesBlock" name="rTriplesBlock">TriplesBlock</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rTriplesSameSubjectPath">TriplesSameSubjectPath</a> ( <span class="token">'.'</span> <a href="#rTriplesBlock">TriplesBlock</a>? )?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[56]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGraphPatternNotTriples" name="rGraphPatternNotTriples">GraphPatternNotTriples</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rGroupOrUnionGraphPattern">GroupOrUnionGraphPattern</a> | <a href="#rFilter">Filter</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[67]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGroupOrUnionGraphPattern" name="rGroupOrUnionGraphPattern">GroupOrUnionGraphPattern</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rGroupGraphPattern">GroupGraphPattern</a> ( <span class="token">'UNION'</span> <a href="#rGroupGraphPattern">GroupGraphPattern</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[68]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rFilter" name="rFilter">Filter</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'FILTER'</span> <a href="#rConstraint">Constraint</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[69]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rConstraint" name="rConstraint">Constraint</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rBrackettedExpression">BrackettedExpression</a> | <a href="#rBuiltInCall">BuiltInCall</a> | <a href="#rFunctionCall">FunctionCall</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[70]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rFunctionCall" name="rFunctionCall">FunctionCall</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#riri">iri</a> <a href="#rArgList">ArgList</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[71]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rArgList" name="rArgList">ArgList</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rNIL">NIL</a> | <span class="token">'('</span> <span class="token">'DISTINCT'</span>? <a href="#rExpression">Expression</a> ( <span class="token">','</span> <a href="#rExpression">Expression</a> )* <span class="token">')'</span> </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[72]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rExpressionList" name="rExpressionList">ExpressionList</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rNIL">NIL</a> | <span class="token">'('</span> <a href="#rExpression">Expression</a> ( <span class="token">','</span> <a href="#rExpression">Expression</a> )* <span class="token">')'</span> </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[77]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPropertyListNotEmpty" name="rPropertyListNotEmpty">PropertyListNotEmpty</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVerb">Verb</a> <a href="#rObjectList">ObjectList</a> ( <span class="token">';'</span> ( <a href="#rVerb">Verb</a> <a href="#rObjectList">ObjectList</a> )? )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[78]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rVerb" name="rVerb">Verb</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVarOrIri">VarOrIri</a> | <span class="token">'a'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[79]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rObjectList" name="rObjectList">ObjectList</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rObject">Object</a> ( <span class="token">','</span> <a href="#rObject">Object</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[80]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rObject" name="rObject">Object</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rGraphNode">GraphNode</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[81]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rTriplesSameSubjectPath" name="rTriplesSameSubjectPath">TriplesSameSubjectPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVarOrTerm">VarOrTerm</a> <a href="#rPropertyListPathNotEmpty">PropertyListPathNotEmpty</a> |	<a href="#rTriplesNodePath">TriplesNodePath</a> <a href="#rPropertyListPath">PropertyListPath</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[82]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPropertyListPath" name="rPropertyListPath">PropertyListPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPropertyListPathNotEmpty">PropertyListPathNotEmpty</a>?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[__]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rParametersList" name="rParametersList">ParametersList</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>( <a href="#rParameter">Parameter</a>* )</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[__]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rParameter" name="rParameter">Parameter</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rNumericLiteral">NumericLiteral</a> | <a href="#rVar">Var</a> | <a href="#rString">String</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[83]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPropertyListPathNotEmpty" name="rPropertyListPathNotEmpty">PropertyListPathNotEmpty</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>( <a href="#rVerbPath">VerbPath</a> | <a href="#rVerbSimple">VerbSimple</a> ) ( <a href="#rObjectListPath">ObjectListPath</a> | <a href="#rParametersList">ParametersList</a> ) ( <span class="token">';'</span> ( ( <a href="#rVerbPath">VerbPath</a> | <a href="#rVerbSimple">VerbSimple</a> ) <a href="#rObjectList">ObjectList</a> )? )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[84]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rVerbPath" name="rVerbPath">VerbPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPath">Path</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[85]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rVerbSimple" name="rVerbSimple">VerbSimple</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVar">Var</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[86]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rObjectListPath" name="rObjectListPath">ObjectListPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rObjectPath">ObjectPath</a> ( <span class="token">','</span> <a href="#rObjectPath">ObjectPath</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[87]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rObjectPath" name="rObjectPath">ObjectPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rGraphNodePath">GraphNodePath</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[88]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPath" name="rPath">Path</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPathAlternative">PathAlternative</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[89]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathAlternative" name="rPathAlternative">PathAlternative</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPathSequence">PathSequence</a> ( <span class="token">'|'</span> <a href="#rPathSequence">PathSequence</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[90]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathSequence" name="rPathSequence">PathSequence</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPathEltOrInverse">PathEltOrInverse</a> ( <span class="token">'/'</span> <a href="#rPathEltOrInverse">PathEltOrInverse</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[91]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathElt" name="rPathElt">PathElt</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPathPrimary">PathPrimary</a> <a href="#rPathMod">PathMod</a>?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[92]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathEltOrInverse" name="rPathEltOrInverse">PathEltOrInverse</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPathElt">PathElt</a> | <span class="token">'^'</span> <a href="#rPathElt">PathElt</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[93]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathMod" name="rPathMod">PathMod</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'?'</span> | <span class="token">'*'</span> | <span class="token">'+'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[94]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathPrimary" name="rPathPrimary">PathPrimary</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#riri">iri</a> | <span class="token">'a'</span> | <span class="token">'!'</span> <a href="#rPathNegatedPropertySet">PathNegatedPropertySet</a> | <span class="token">'('</span> <a href="#rPath">Path</a> <span class="token">')'</span> </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[95]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathNegatedPropertySet" name="rPathNegatedPropertySet">PathNegatedPropertySet</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPathOneInPropertySet">PathOneInPropertySet</a> | <span class="token">'('</span> ( <a href="#rPathOneInPropertySet">PathOneInPropertySet</a> ( <span class="token">'|'</span> <a href="#rPathOneInPropertySet">PathOneInPropertySet</a> )* )? <span class="token">')'</span> </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[96]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPathOneInPropertySet" name="rPathOneInPropertySet">PathOneInPropertySet</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#riri">iri</a> | <span class="token">'a'</span> | <span class="token">'^'</span> ( <a href="#riri">iri</a> | <span class="token">'a'</span> ) </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[97]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rInteger" name="rInteger">Integer</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rINTEGER">INTEGER</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[98]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rTriplesNode" name="rTriplesNode">TriplesNode</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rCollection">Collection</a> |	<a href="#rBlankNodePropertyList">BlankNodePropertyList</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[99]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBlankNodePropertyList" name="rBlankNodePropertyList">BlankNodePropertyList</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'['</span> <a href="#rPropertyListNotEmpty">PropertyListNotEmpty</a> <span class="token">']'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[100]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rTriplesNodePath" name="rTriplesNodePath">TriplesNodePath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rCollectionPath">CollectionPath</a> |	<a href="#rBlankNodePropertyListPath">BlankNodePropertyListPath</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[101]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBlankNodePropertyListPath" name="rBlankNodePropertyListPath">BlankNodePropertyListPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'['</span> <a href="#rPropertyListPathNotEmpty">PropertyListPathNotEmpty</a> <span class="token">']'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[102]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rCollection" name="rCollection">Collection</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'('</span> <a href="#rGraphNode">GraphNode</a>+ <span class="token">')'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[103]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rCollectionPath" name="rCollectionPath">CollectionPath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'('</span> <a href="#rGraphNodePath">GraphNodePath</a>+ <span class="token">')'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[104]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGraphNode" name="rGraphNode">GraphNode</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVarOrTerm">VarOrTerm</a> |	<a href="#rTriplesNode">TriplesNode</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[105]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGraphNodePath" name="rGraphNodePath">GraphNodePath</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVarOrTerm">VarOrTerm</a> |	<a href="#rTriplesNodePath">TriplesNodePath</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[106]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rVarOrTerm" name="rVarOrTerm">VarOrTerm</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVar">Var</a> | <a href="#rGraphTerm">GraphTerm</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[107]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rVarOrIri" name="rVarOrIri">VarOrIri</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVar">Var</a> | <a href="#riri">iri</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[108]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rVar" name="rVar">Var</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rVAR1">VAR1</a> | <a href="#rVAR2">VAR2</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[109]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rGraphTerm" name="rGraphTerm">GraphTerm</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#riri">iri</a> |	<a href="#rRDFLiteral">RDFLiteral</a> |	<a href="#rNumericLiteral">NumericLiteral</a> |	<a href="#rBooleanLiteral">BooleanLiteral</a> |	<a href="#rBlankNode">BlankNode</a> |	<a href="#rNIL">NIL</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[110]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rExpression" name="rExpression">Expression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rConditionalOrExpression">ConditionalOrExpression</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[111]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rConditionalOrExpression" name="rConditionalOrExpression">ConditionalOrExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rConditionalAndExpression">ConditionalAndExpression</a> ( <span class="token">'||'</span> <a href="#rConditionalAndExpression">ConditionalAndExpression</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[112]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rConditionalAndExpression" name="rConditionalAndExpression">ConditionalAndExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rValueLogical">ValueLogical</a> ( <span class="token">'&amp;&amp;'</span> <a href="#rValueLogical">ValueLogical</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[113]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rValueLogical" name="rValueLogical">ValueLogical</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rRelationalExpression">RelationalExpression</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[114]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rRelationalExpression" name="rRelationalExpression">RelationalExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rNumericExpression">NumericExpression</a> ( <span class="token">'='</span> <a href="#rNumericExpression">NumericExpression</a> | <span class="token">'!='</span> <a href="#rNumericExpression">NumericExpression</a> | <span class="token">'&lt;'</span> <a href="#rNumericExpression">NumericExpression</a> | <span class="token">'&gt;'</span> <a href="#rNumericExpression">NumericExpression</a> | <span class="token">'&lt;='</span> <a href="#rNumericExpression">NumericExpression</a> | <span class="token">'&gt;='</span> <a href="#rNumericExpression">NumericExpression</a> | <span class="token">'IN'</span> <a href="#rExpressionList">ExpressionList</a> | <span class="token">'NOT'</span> <span class="token">'IN'</span> <a href="#rExpressionList">ExpressionList</a> )?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[115]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rNumericExpression" name="rNumericExpression">NumericExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rAdditiveExpression">AdditiveExpression</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[116]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rAdditiveExpression" name="rAdditiveExpression">AdditiveExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rMultiplicativeExpression">MultiplicativeExpression</a> ( <span class="token">'+'</span> <a href="#rMultiplicativeExpression">MultiplicativeExpression</a> | <span class="token">'-'</span> <a href="#rMultiplicativeExpression">MultiplicativeExpression</a> | ( <a href="#rNumericLiteralPositive">NumericLiteralPositive</a> | <a href="#rNumericLiteralNegative">NumericLiteralNegative</a> ) ( ( <span class="token">'*'</span> <a href="#rUnaryExpression">UnaryExpression</a> ) | ( <span class="token">'/'</span> <a href="#rUnaryExpression">UnaryExpression</a> ) )* )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[117]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rMultiplicativeExpression" name="rMultiplicativeExpression">MultiplicativeExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rUnaryExpression">UnaryExpression</a> ( <span class="token">'*'</span> <a href="#rUnaryExpression">UnaryExpression</a> | <span class="token">'/'</span> <a href="#rUnaryExpression">UnaryExpression</a> )*</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[118]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rUnaryExpression" name="rUnaryExpression">UnaryExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>&nbsp;&nbsp;<span class="token">'!'</span> <a href="#rPrimaryExpression">PrimaryExpression</a> <br>|	<span class="token">'+'</span> <a href="#rPrimaryExpression">PrimaryExpression</a> <br>|	<span class="token">'-'</span> <a href="#rPrimaryExpression">PrimaryExpression</a> <br>|	<a href="#rPrimaryExpression">PrimaryExpression</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[119]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPrimaryExpression" name="rPrimaryExpression">PrimaryExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rBrackettedExpression">BrackettedExpression</a> | <a href="#rBuiltInCall">BuiltInCall</a> | <a href="#ririOrFunction">iriOrFunction</a> | <a href="#rRDFLiteral">RDFLiteral</a> | <a href="#rNumericLiteral">NumericLiteral</a> | <a href="#rBooleanLiteral">BooleanLiteral</a> | <a href="#rVar">Var</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[120]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBrackettedExpression" name="rBrackettedExpression">BrackettedExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[121]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBuiltInCall" name="rBuiltInCall">BuiltInCall</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>&nbsp;&nbsp;<a href="#rAggregate">Aggregate</a> <br>|	<span class="token">'STR'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'COALESCE'</span> <a href="#rExpressionList">ExpressionList</a> <br>|	<span class="token">'IF'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'STRLANG'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'STRDT'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'sameTerm'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'isIRI'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'isURI'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'isBLANK'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'isLITERAL'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<span class="token">'isNUMERIC'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>|	<a href="#rRegexExpression">RegexExpression</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[122]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rRegexExpression" name="rRegexExpression">RegexExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'REGEX'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> ( <span class="token">','</span> <a href="#rExpression">Expression</a> )? <span class="token">')'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[123]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rSubstringExpression" name="rSubstringExpression">SubstringExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'SUBSTR'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> ( <span class="token">','</span> <a href="#rExpression">Expression</a> )? <span class="token">')'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[124]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rStrReplaceExpression" name="rStrReplaceExpression">StrReplaceExpression</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'REPLACE'</span> <span class="token">'('</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> <span class="token">','</span> <a href="#rExpression">Expression</a> ( <span class="token">','</span> <a href="#rExpression">Expression</a> )? <span class="token">')'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[127]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rAggregate" name="rAggregate">Aggregate</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code>&nbsp;&nbsp;<span class="token">'COUNT'</span> <span class="token">'('</span> <span class="token">'DISTINCT'</span>? ( <span class="token">'*'</span> | <a href="#rExpression">Expression</a> ) <span class="token">')'</span> <br>| <span class="token">'SUM'</span> <span class="token">'('</span> <span class="token">'DISTINCT'</span>? <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>| <span class="token">'MIN'</span> <span class="token">'('</span> <span class="token">'DISTINCT'</span>? <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>| <span class="token">'MAX'</span> <span class="token">'('</span> <span class="token">'DISTINCT'</span>? <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>| <span class="token">'AVG'</span> <span class="token">'('</span> <span class="token">'DISTINCT'</span>? <a href="#rExpression">Expression</a> <span class="token">')'</span> <br>| <span class="token">'GROUP_CONCAT'</span> <span class="token">'('</span> <span class="token">'DISTINCT'</span>? <a href="#rExpression">Expression</a> ( <span class="token">';'</span> <span class="token">'SEPARATOR'</span> <span class="token">'='</span> <a href="#rString">String</a> )? <span class="token">')'</span> </code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[128]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="ririOrFunction" name="ririOrFunction">iriOrFunction</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#riri">iri</a> <a href="#rArgList">ArgList</a>?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[129]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rRDFLiteral" name="rRDFLiteral">RDFLiteral</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rString">String</a> ( <span class="token">'^^'</span> <a href="#riri">iri</a> )?</code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[130]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rNumericLiteral" name="rNumericLiteral">NumericLiteral</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rNumericLiteralUnsigned">NumericLiteralUnsigned</a> | <a href="#rNumericLiteralPositive">NumericLiteralPositive</a> | <a href="#rNumericLiteralNegative">NumericLiteralNegative</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[131]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rNumericLiteralUnsigned" name="rNumericLiteralUnsigned">NumericLiteralUnsigned</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rINTEGER">INTEGER</a> |	<a href="#rDECIMAL">DECIMAL</a> |	<a href="#rDOUBLE">DOUBLE</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[132]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rNumericLiteralPositive" name="rNumericLiteralPositive">NumericLiteralPositive</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rINTEGER_POSITIVE">INTEGER_POSITIVE</a> |	<a href="#rDECIMAL_POSITIVE">DECIMAL_POSITIVE</a> |	<a href="#rDOUBLE_POSITIVE">DOUBLE_POSITIVE</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[133]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rNumericLiteralNegative" name="rNumericLiteralNegative">NumericLiteralNegative</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rINTEGER_NEGATIVE">INTEGER_NEGATIVE</a> |	<a href="#rDECIMAL_NEGATIVE">DECIMAL_NEGATIVE</a> |	<a href="#rDOUBLE_NEGATIVE">DOUBLE_NEGATIVE</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[134]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBooleanLiteral" name="rBooleanLiteral">BooleanLiteral</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><span class="token">'true'</span> |	<span class="token">'false'</span></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[135]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rString" name="rString">String</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rSTRING_LITERAL1">STRING_LITERAL1</a> | <a href="#rSTRING_LITERAL2">STRING_LITERAL2</a> | <a href="#rSTRING_LITERAL_LONG1">STRING_LITERAL_LONG1</a> | <a href="#rSTRING_LITERAL_LONG2">STRING_LITERAL_LONG2</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[136]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="riri" name="riri">iri</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rIRIREF">IRIREF</a> |	<a href="#rPrefixedName">PrefixedName</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[137]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rPrefixedName" name="rPrefixedName">PrefixedName</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rPNAME_LN">PNAME_LN</a> | <a href="#rPNAME_NS">PNAME_NS</a></code></td>
+						        </tr>
+						        <tr valign="baseline">
+						            <td><code>[138]&nbsp;&nbsp;</code></td>
+						            <td><code><a id="rBlankNode" name="rBlankNode">BlankNode</a></code></td>
+						            <td>&nbsp;&nbsp;::=&nbsp;&nbsp;</td>
+						            <td><code><a href="#rBLANK_NODE_LABEL">BLANK_NODE_LABEL</a> |	<a href="#rANON">ANON</a></code></td>
+						        </tr>
+						    </tbody>
+						</table>
+                
+                
+                
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <script src="js/hitua.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="product" content="Metro UI CSS Framework">
+    <meta name="description" content="Simple responsive css framework">
+    <meta name="author" content="Sergey S. Pimenov, Ukraine, Kiev">
+
+    <link href="css/metro-bootstrap.css" rel="stylesheet">
+    <link href="css/metro-bootstrap-responsive.css" rel="stylesheet">
+    <link href="css/iconFont.css" rel="stylesheet">
+    <link href="css/docs.css" rel="stylesheet">
+    <link href="js/prettify/prettify.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/content.css">
+   <!-- <link href="js/jquery/autocomplete/bootstrap.css" rel="stylesheet"/>-->
+    <!--<link href="js/jquery/jquery.textcomplete.css" rel="stylesheet">-->
+
+    <!-- Load JavaScript Libraries -->
+    <script src="js/jquery/jquery.min.js"></script>
+    <script src="js/jquery/jquery.widget.min.js"></script>
+    <script src="js/jquery/jquery.mousewheel.js"></script>
+    <!--<script src="js/jquery/jquery.textcomplete.min.js"></script>-->
+    <script src="js/prettify/prettify.js"></script>
+	<script src="js/online.js"></script>
+
+    <!-- Metro UI CSS JavaScript plugins -->
+    <script src="js/load-metro.js"></script>
+
+	<script src="js/jquery/autocomplete/jquery.overlay.js"></script>
+	<script src="js/jquery/autocomplete/jquery.textcomplete.js"></script>
+	<script src="js/jquery/autocomplete/emoji.js"></script>
+	<script src="js/jquery/autocomplete/main.js"></script>
+	
+    <!-- Local JavaScript -->
+    <script src="js/docs.js"></script>
+    <script src="js/github.info.js"></script>
+    <title>LOSM: Linked Open Street Map <sup>beta version</sup></title>
+</head>
+<body class="metro">
+
+ <!--   <script  type="text/javascript">
+    $('#querytext').textcomplete([{ // tech companies
+                                      words: ['apple', 'google', 'facebook', 'github'],
+                                      match: /\b(\w{2,})$/,
+                                      search: function (term, callback) {
+                                          callback($.map(this.words, function (word) {
+                                              return word.indexOf(term) === 0 ? word : null;
+                                          }));
+                                      },
+                                      index: 1,
+                                      replace: function (word) {
+                                          return word + ' ';
+                                      }
+                                  }
+                              ], {
+                                  onKeydown: function (e, commands) {
+                                      if (e.ctrlKey && e.keyCode === 74) { // CTRL-J
+                                          return commands.KEY_ENTER;
+                                      }
+                                  }
+                              });
+
+    </script>-->
+
+    <!-- <header class="bg-dark" data-load="header.html"></header>-->
+    <div class="container">
+                <h1>
+                    <a href="/semanticweb/lod/losm"><i class="icon-arrow-left-3 fg-darker smaller"></i></a>
+                    LOSM: Linked Open Street Map <sup>beta version</sup>
+                </h1>
+
+                <div class="grid">
+                    <div class="row">
+                        <div class="span3 no-tablet-portrait">
+                            <nav>
+                                <ul class="side-menu">
+                                
+                                    <li><a onclick="$('#querytext').val('SELECT ?link ?lat ?lon\n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;London&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	'}');">Select nodes called London and retrieve lat and lon</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object ?name\n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+					  					'   ?object spatial:nearby(?lat ?lon 100 \&apos;m\&apos;) .\n'+
+										' \n'+
+                                    	'   ?object rdfs:label ?name .   \n'+
+                                    	'}');">Spatial:nearby example in meters</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:withinCircle(?lat ?lon 100 \&apos;m\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object a lgdo:Amenity. \n'+
+                                    	'}\n');">Spatial:withinCircle query example</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object \n'+
+                                    	'WHERE  {  \n'+
+                                    	' \n'+
+                                    	'   ?object spatial:withinBox(50.746 7.154 50.748 7.157) . \n'+
+                                    	' \n'+
+                                    	'}\n');">Spatial:withinBox query example</a></li>
+                                
+                                    <li><a onclick="$('#querytext').val('SELECT ?object \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?object spatial:within(&quot;POLYGON((50.746 7.157,50.746 7.154,50.748 7.154,50.748 7.157))&quot;) .\n'+
+                                    	'}\n');">Spatial:within with WKT polygon</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:nearby(?lat ?lon 200 \&apos;m\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object a lgdo:DrinkingWater. \n'+
+                                    	'}\n');">Query with form ?var a lgdo:tag</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:nearby(?lat ?lon 200 \&apos;m\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object lgdo:Amenity lgdo:DrinkingWater. \n'+
+                                    	'}\n');">Query with form ?var lgdo:key lgdo:tag</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:nearby(?lat ?lon 100 \&apos;m\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object a lgdo:Amenity. \n'+
+                                    	'}\n');">Query with form ?var a lgdo:key</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object ?name \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:nearby(?lat ?lon 1 \&apos;km\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object rdfs:label ?name. \n'+
+                                    	'}\n');">Spatial:nearby example in kilometers</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?object ?name \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:nearby(?lat ?lon 1 \&apos;mi\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object rdfs:label ?name. \n'+
+                                    	'}\n');">Spatial:nearby example in miles</a></li>
+                                    <li><a onclick="$('#querytext').val('SELECT ?cinema ?nameC \n'+
+                                    	'WHERE  {  \n'+
+                                    	'   ?link rdfs:label &quot;Sisinf Lab&quot; .  \n'+
+                                    	'   ?link geo:lat ?lat .\n'+
+                                    	'   ?link geo:long ?lon.\n'+
+                                    	' \n'+
+                                    	'   ?object spatial:nearby(?lat ?lon 200 \&apos;m\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?object a lgdo:DrinkingWater . \n'+
+                                    	'   ?object geo:lat ?lat2 .\n'+
+                                    	'   ?object geo:long ?lon2.\n'+
+                                    	'   \n'+
+                                    	'   ?cinema spatial:nearby(?lat2 ?lon2 1000 \&apos;m\&apos;) . \n'+
+                                    	' \n'+
+                                    	'   ?cinema a lgdo:Cinema .\n'+
+                                    	'   ?cinema rdfs:label ?nameC .\n'+
+                                    	'}\n');">3 nested query (very slow)</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="span9">
+                            <p class="description">
+                                You can easily try the queries on side panel
+                            </p>
+
+                            <h2 id="_default"><i class="icon-accessibility on-left"></i>Demo Version</h2>
+                            <div class="example">
+                                <form action="/Sparql_test/sparql" method="get">
+                                    <fieldset>
+                                        <legend>Query Editor</legend>
+                                        
+                                        <label>
+
+										PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; <br />
+										PREFIX lgdo: &lt;http://linkedgeodata.org/ontology/&gt; <br />
+										PREFIX spatial: &lt;http://jena.apache.org/spatial#&gt; <br />
+										PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
+										</label>
+										<div id=content>
+                                   		 <div class="input-control textarea" data-role="input-control">
+                                        	<textarea id="querytext" type="text" name="query" style="height: 400px;min-height: 250px;" ></textarea>
+                                    	<script id="target" type="text/javascript">
+											    $('#querytext').textcomplete({
+											    // emoji strategy
+											    emoji: {
+											        match: /\blgdo\:(\w{1,})$/,
+											        search: function (term, callback) {
+											        	 term = term.toLowerCase();
+											            callback($.map(emojies, function (emoji) {
+											                return emoji.toLowerCase().indexOf(term) === 0 ? emoji : null;
+											            }));
+											        },
+											        template: function (value) {
+											            return  value + ' ' ;
+											        },
+											        replace: function (value) {
+											            return 'lgdo:' + value + ' ' ;
+											        },
+											        index: 1,
+											        maxCount: 999
+											    }
+											},
+										    {
+										    	maxCount: 999
+				                                  });
+									
+									    </script>
+                                    	</div>
+                                    	 <div id="parse-message" class="message disabled">Parser not available.</div>
+                                        </div>
+                                        <label>Output Format</label>
+                                        <div>
+                                            <div class="input-control radio default-style" data-role="input-control">
+                                                <label>
+                                                    <input type="radio" name="format" checked value="application/sparql-results+txt" />
+                                                    <span class="check"></span>
+                                                    txt
+                                                </label>
+                                            </div>
+                                            <div class="input-control radio  default-style" data-role="input-control">
+                                                <label>
+                                                    <input type="radio" name="format" value="application/sparql-results+html"/>
+                                                    <span class="check"></span>
+                                                    html
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="input-control radio  default-style" data-role="input-control">
+                                                <label>
+                                                    <input type="radio" name="format" value="application/sparql-results+xml" />
+                                                    <span class="check"></span>
+                                                    xml
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="input-control radio  default-style" data-role="input-control">
+                                                <label>
+                                                    <input type="radio" name="format" value="application/sparql-results+json"/>
+                                                    <span class="check"></span>
+                                                    json
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <input type="submit" value="Submit">
+                                    </fieldset>
+                                </form>
+                            </div>
+
+
+
+                           
+
+                        </div>
+                    </div>
+                </div>
+    </div>
+
+    <script src="js/hitua.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+.upperleft {
+	position: absolute; 
+	top: 10px; 
+	left: 10px; 
+	border: 0;  
+	height: 70px;
+
+ }
+
+.upperright {
+	position: absolute; 
+	top: 10px; 
+	right: 10px; 
+	border: 0;  
+	height: 70px;
+
+ }
+
+.upperdivider {
+	position: absolute; 
+	top: 90px; 
+	border-top: 2px;
+	border-left: 0px;
+	border-right: 0px;
+	border-bottom:2px;
+	height: 5px;
+        border-style: solid;
+	width: 100%;
+	border-color:#3465a4;
+
+	background: linear-gradient(to right,  #fff , #048584);
+
+ }
+
+.lowerdivider {
+	position: absolute; 
+	bottom: 110px; 
+	border-top: 2px;
+	border-left: 0px;
+	border-right: 0px;
+	border-bottom:2px;
+	height: 5px;
+        border-style: solid;
+	width: 100%;
+	border-color:#3465a4;
+
+	background: linear-gradient(to right,  #fff , #048584);
+
+ }
