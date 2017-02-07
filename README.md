@@ -1,4 +1,4 @@
-LOSM Linked Open Street Map 
+LOSM: Linked Open Street Map 
 ============================
 A middleware to query OSM via SPARQL queries
 ---------------
