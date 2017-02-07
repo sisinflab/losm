@@ -13,7 +13,7 @@ The lexer and the parser were built using java CUP tool, for details you can see
 
 If you consider LOSM an interesting work please cite us, and if you are interested in knowing more about LOSM and you can have a look at this paper:
 
-> @inproceedings{losm-ieaaie, 
+> @inproceedings{losm-ieaaie,    
 >  author    = {Vito Walter Anelli and Andrea Cal{\`{\i}} and Tommaso {Di Noia} and Matteo Palmonari and Azzurra Ragone}, 
 >  title     = {Exposing Open Street Map in the Linked Data Cloud},  
 >  booktitle = {Trends in Applied Knowledge-Based Systems and Data Science - 29th International Conference on Industrial Engineering and Other Applications of Applied Intelligent Systems, {IEA/AIE} 2016, Morioka, Japan, August 2-4, 2016, Proceedings},    
