@@ -15,11 +15,11 @@ If you consider LOSM an interesting work please cite us, and if you are interest
 
 > @inproceedings{losm-ieaaie, 
 >  author    = {Vito Walter Anelli and Andrea Cal{\`{\i}} and Tommaso {Di Noia} and Matteo Palmonari and Azzurra Ragone}, 
->  title     = {Exposing Open Street Map in the Linked Data Cloud}, 
->  booktitle = {Trends in Applied Knowledge-Based Systems and Data Science - 29th International Conference on Industrial Engineering and Other Applications of Applied Intelligent Systems, {IEA/AIE} 2016, Morioka, Japan, August 2-4, 2016, Proceedings}, 
->  pages     = {344--355}, 
->  year      = {2016}, 
->  doi       = {10.1007/978-3-319-42007-3_29}, 
+>  title     = {Exposing Open Street Map in the Linked Data Cloud},  
+>  booktitle = {Trends in Applied Knowledge-Based Systems and Data Science - 29th International Conference on Industrial Engineering and Other Applications of Applied Intelligent Systems, {IEA/AIE} 2016, Morioka, Japan, August 2-4, 2016, Proceedings},    
+>  pages     = {344--355},    
+>  year      = {2016},  
+>  doi       = {10.1007/978-3-319-42007-3_29},  
 > } 
 
 Contacts
