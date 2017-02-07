@@ -11,7 +11,7 @@ The subset of the Sparql 1.1 grammar used to develop this demo is available at h
 The subset of the Sparql 1.1 grammar used to develop the PEG parser is available at https://github.com/sisinflab/losm/blob/master/WebContent/losm_peg_grammar.html
 The lexer and the parser were built using java CUP tool, for details you can see the .cup and .lex sources at https://github.com/sisinflab/losm/tree/master/src/it/poliba/sisinflab/semanticweb/lod/losm/sparl
 
-If you consider LOSM an interesting work please cite us, and if you are interested in knowing more about LOSM and you can have a look at this paper:
+If you consider LOSM an interesting work please cite us, and if you are interested in knowing more about LOSM you can take a look at the paper [Exposing Open Street Map in the Linked Data Cloud](http://link.springer.com/chapter/10.1007/978-3-319-42007-3_29)
 
 > @inproceedings{losm-ieaaie,    
 >  author    = {Vito Walter Anelli and Andrea Cal{\`{\i}} and Tommaso {Di Noia} and Matteo Palmonari and Azzurra Ragone}, 
