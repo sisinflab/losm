@@ -1,4 +1,4 @@
-package it.poliba.sisinflab.semanticweb.lod.losm.sparqlToRest;
+package sparqlToRest;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,13 +26,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import it.poliba.sisinflab.semanticweb.lod.losm.sparl.Gate;
-import it.poliba.sisinflab.semanticweb.lod.losm.sparl.ResultMap;
+import sparql.Gate;
+import sparql.ResultMap;
 
 /**
  * Servlet implementation class Sparql
@@ -82,6 +83,9 @@ public class Sparql extends HttpServlet {
 				"PREFIX spatial: <http://jena.apache.org/spatial#> \n"+
 				"PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> \n"+
 				"PREFIX losm: <http://sisinflab.poliba.it/semanticweb/lod/losm/ontology/>\n";
+    	//System.out.println(a[0]);
+    	//System.out.println(searchpolygons(a[0]));
+    	a[0]=searchpolygons(a[0]);
     	a[0]=prefixes+a[0];
     	Gate queryhandler = new Gate();
 		results = queryhandler.ask(a);
@@ -152,9 +156,68 @@ public class Sparql extends HttpServlet {
 						}
 							}else {
 								
-					
-								System.out.println("No results");
+								try {
+									
+							    	response.setContentType("text/xml; charset=UTF-8");
+							    	response.setCharacterEncoding("UTF-8");
+			
+							    	out = response.getWriter();
+									printXml();
+									
+									
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+								
 							}
+					}else {
+						//System.out.println("No results");
+						// no results...
+						if (a[1].contains("application/sparql-results+txt"))	{
+							try {
+		
+						    	response.setContentType("text/html; charset=UTF-8");
+						    	response.setCharacterEncoding("UTF-8");
+		
+						    	out = response.getWriter();
+								printResults();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+					}
+							
+					if (a[1].contains("application/sparql-results+xml"))	{
+							try {
+		
+						    	response.setContentType("text/xml; charset=UTF-8");
+						    	response.setCharacterEncoding("UTF-8");
+		
+						    	out = response.getWriter();
+								printXml();
+								
+								
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+					}
+					
+					if (a[1].contains("application/sparql-results+json"))	{
+		
+				    		response.setContentType("application/json; charset=UTF-8");
+				    		response.setCharacterEncoding("UTF-8");
+		
+				        	out = response.getWriter();
+							printJson();
+					}
+					
+					if (a[1].contains("application/sparql-results+html"))	{
+		
+				    		response.setContentType("text/html; charset=UTF-8");
+				    		response.setCharacterEncoding("UTF-8");
+		
+				        	out = response.getWriter();
+							printXhtml();
+					}
 					}
 					
 		}
@@ -315,28 +378,34 @@ public class Sparql extends HttpServlet {
 	}
 */
 	public void printResults() throws IOException{
-		Iterator iterator = results.keySet().iterator();
-		 String firstKey = iterator.next().toString();
-		for (int i = 0; i < results.get(firstKey).size(); i++) {
-			Iterator iterator2 = results.keySet().iterator();
-			out.println("<br />");
-			out.println("***********************************");
-
-			out.println("<br />");
-		    out.println("Risultato numero: "+i);
-
-			out.println("<br />");
-			while (iterator2.hasNext()) {
-			    String key = iterator2.next().toString();
-			    ArrayList<String> ArrayValue = results.get(key);
-			    out.println("*** "+key + " " + ArrayValue.get(i));
-
+		
+		if (!ResultMap.totalResults.isEmpty()){
+			Iterator iterator = results.keySet().iterator();
+			 String firstKey = iterator.next().toString();
+			for (int i = 0; i < results.get(firstKey).size(); i++) {
+				Iterator iterator2 = results.keySet().iterator();
 				out.println("<br />");
-				}
-
-			out.println("***********************************\n");
-
-			out.println("<br />");
+				out.println("***********************************");
+	
+				out.println("<br />");
+			    out.println("Risultato numero: "+i);
+	
+				out.println("<br />");
+				while (iterator2.hasNext()) {
+				    String key = iterator2.next().toString();
+				    ArrayList<String> ArrayValue = results.get(key);
+				    out.println("*** "+key + " " + ArrayValue.get(i));
+	
+					out.println("<br />");
+					}
+	
+				out.println("***********************************\n");
+	
+				out.println("<br />");
+			}
+		}else {
+			out.println("No results");
+			out.println(ResultMap.selectList);
 		}
 	}
 	
@@ -357,7 +426,17 @@ public class Sparql extends HttpServlet {
 			// staff elements
 			Element head = doc.createElement("head");
 			rootElement.appendChild(head);
+			/*
 			Iterator iterator2 = ResultMap.totalResults.keySet().iterator();
+			while (iterator2.hasNext()) {
+			    String key2 = iterator2.next().toString();
+			    String key = key2.substring(1);
+				Element variable = doc.createElement("variable");
+				head.appendChild(variable);
+				variable.setAttribute("name", key);;
+				}
+				*/
+			Iterator iterator2 = ResultMap.selectList.iterator();
 			while (iterator2.hasNext()) {
 			    String key2 = iterator2.next().toString();
 			    String key = key2.substring(1);
@@ -370,32 +449,34 @@ public class Sparql extends HttpServlet {
 			rootElement.appendChild(results);
 			results.setAttribute("distinct", "true");
 			results.setAttribute("ordered", "false");
-
-			Iterator iterator = ResultMap.totalResults.keySet().iterator();
-			 String firstKey = iterator.next().toString();
-			for (int i = 0; i < ResultMap.totalResults.get(firstKey).size(); i++) {
-				Iterator iterator3 = ResultMap.totalResults.keySet().iterator();
-				
-				Element result = doc.createElement("result");
-				results.appendChild(result);
-				
-				while (iterator3.hasNext()) {
-				    String key2 = iterator3.next().toString();
-				    ArrayList<String> ArrayValue = ResultMap.totalResults.get(key2);
-
-					Element binding = doc.createElement("binding");
-					result.appendChild(binding);
-
-				    String key = key2.substring(1);
-					binding.setAttribute("name", key);
-					Element type = doc.createElement(ResultMap.varsType.get(key2));
-					binding.appendChild(type);
-					
-					type.appendChild(doc.createTextNode(ArrayValue.get(i)));
-					}
-
-			}
 			
+			if (!ResultMap.totalResults.isEmpty()){
+			
+				Iterator iterator = ResultMap.totalResults.keySet().iterator();
+				 String firstKey = iterator.next().toString();
+				for (int i = 0; i < ResultMap.totalResults.get(firstKey).size(); i++) {
+					Iterator iterator3 = ResultMap.totalResults.keySet().iterator();
+					
+					Element result = doc.createElement("result");
+					results.appendChild(result);
+					
+					while (iterator3.hasNext()) {
+					    String key2 = iterator3.next().toString();
+					    ArrayList<String> ArrayValue = ResultMap.totalResults.get(key2);
+	
+						Element binding = doc.createElement("binding");
+						result.appendChild(binding);
+	
+					    String key = key2.substring(1);
+						binding.setAttribute("name", key);
+						Element type = doc.createElement(ResultMap.varsType.get(key2));
+						binding.appendChild(type);
+						
+						type.appendChild(doc.createTextNode(ArrayValue.get(i)));
+						}
+	
+				}
+			}
 			
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -422,7 +503,7 @@ public class Sparql extends HttpServlet {
 		JsonArray link = new JsonArray();
 		head.put("link", link);
 		JsonArray vars = new JsonArray();
-
+		/*
 		Iterator iterator2 = ResultMap.totalResults.keySet().iterator();
 		while (iterator2.hasNext()) {
 		    String key2 = iterator2.next().toString();
@@ -431,29 +512,42 @@ public class Sparql extends HttpServlet {
 			}
 		head.put("vars", vars);
 		root.put("head", head);
+		*/
 
+		Iterator iterator2 = ResultMap.selectList.iterator();
+		while (iterator2.hasNext()) {
+		    String key2 = iterator2.next().toString();
+		    String key = key2.substring(1);
+		    vars.add(key);
+			}
+		head.put("vars", vars);
+		root.put("head", head);
+		
 		JsonObject results = new JsonObject();
 		results.put("distinct", "true");
 		results.put("ordered", "false");
 		
 		JsonArray bindings = new JsonArray();
-
-		Iterator iterator = ResultMap.totalResults.keySet().iterator();
-		 String firstKey = iterator.next().toString();
-		for (int i = 0; i < ResultMap.totalResults.get(firstKey).size(); i++) {
-			Iterator iterator3 = ResultMap.totalResults.keySet().iterator();
-			JsonObject result = new JsonObject();
-			
-			while (iterator3.hasNext()) {
-			    String key2 = iterator3.next().toString();
-			    ArrayList<String> ArrayValue = ResultMap.totalResults.get(key2);
-			    String key = key2.substring(1);
-			    JsonObject var = new JsonObject();
-			    var.put("type", ResultMap.varsType.get(key2));
-			    var.put("value", ArrayValue.get(i));
-			    result.put(key, var);
-				}
-			bindings.add(result);
+		
+		if (!ResultMap.totalResults.isEmpty()){
+		
+			Iterator iterator = ResultMap.totalResults.keySet().iterator();
+			 String firstKey = iterator.next().toString();
+			for (int i = 0; i < ResultMap.totalResults.get(firstKey).size(); i++) {
+				Iterator iterator3 = ResultMap.totalResults.keySet().iterator();
+				JsonObject result = new JsonObject();
+				
+				while (iterator3.hasNext()) {
+				    String key2 = iterator3.next().toString();
+				    ArrayList<String> ArrayValue = ResultMap.totalResults.get(key2);
+				    String key = key2.substring(1);
+				    JsonObject var = new JsonObject();
+				    var.put("type", ResultMap.varsType.get(key2));
+				    var.put("value", ArrayValue.get(i));
+				    result.put(key, var);
+					}
+				bindings.add(result);
+			}
 		}
 		results.put("bindings", bindings);
 		root.put("results",results);
@@ -468,8 +562,9 @@ public class Sparql extends HttpServlet {
 		html+="<html>\n<head>\n</head>\n<body>\n";
 		html+="<table class=\"sparql\" border=\"1\">\n";
 		
-		Iterator iterator2 = ResultMap.totalResults.keySet().iterator();
-
+		
+		/*
+		 * Iterator iterator2 = ResultMap.totalResults.keySet().iterator();
 		html+="<tr>\n";
 		while (iterator2.hasNext()) {
 		    String key2 = iterator2.next().toString();
@@ -478,28 +573,42 @@ public class Sparql extends HttpServlet {
 			}
 
 		html+="</tr>\n";
-
-		Iterator iterator = ResultMap.totalResults.keySet().iterator();
-		 String firstKey = iterator.next().toString();
-		for (int i = 0; i < ResultMap.totalResults.get(firstKey).size(); i++) {
-			Iterator iterator3 = ResultMap.totalResults.keySet().iterator();
-			
-
-			html+="<tr>\n";
-			
-			while (iterator3.hasNext()) {
-			    String key2 = iterator3.next().toString();
-			    ArrayList<String> ArrayValue = ResultMap.totalResults.get(key2);
-			    String key = key2.substring(1);
-			    if (ResultMap.varsType.get(key2).equals("uri")){
-			    	html+="<th><a href=\""+ArrayValue.get(i)+"\" target=_blank >"+ArrayValue.get(i)+"</a></th>\n";
-			    } else
-			    {			    
-			    	html+="<th>"+ArrayValue.get(i)+"</th>\n";
-			    }
+		 */
+		Iterator iterator2 = ResultMap.selectList.iterator();
+		html+="<tr>\n";
+		while (iterator2.hasNext()) {
+		    String key2 = iterator2.next().toString();
+		    String key = key2.substring(1);
+		    html+="<th>"+key+"</th>\n";
 			}
 
-			html+="</tr>\n";
+		html+="</tr>\n";
+		
+		if (!ResultMap.totalResults.isEmpty()){
+		
+			Iterator iterator = ResultMap.selectList.iterator();
+			 String firstKey = iterator.next().toString();
+			for (int i = 0; i < ResultMap.totalResults.get(firstKey).size(); i++) {
+				Iterator iterator3 = ResultMap.selectList.iterator();
+				
+	
+				html+="<tr>\n";
+				
+				while (iterator3.hasNext()) {
+				    String key2 = iterator3.next().toString();
+				    ArrayList<String> ArrayValue = ResultMap.totalResults.get(key2);
+				    String key = key2.substring(1);
+				    if (ResultMap.varsType.get(key2).equals("uri")){
+				    	html+="<th><a href=\""+ArrayValue.get(i)+"\" target=_blank >"+ArrayValue.get(i)+"</a></th>\n";
+				    } else
+				    {			    
+				    	html+="<th>"+ArrayValue.get(i)+"</th>\n";
+				    }
+				}
+	
+				html+="</tr>\n";
+			}
+		
 		}
 		html+="</table>\n";
 		html+="</body>\n</html>";
@@ -521,6 +630,92 @@ public class Sparql extends HttpServlet {
 			return map;
 		  }
 	
-	
+
+	    public static String searchpolygons(String input) {
+	    	
+	    	int count = StringUtils.countMatches(input.toLowerCase(), "polygon");
+	    	
+	    	int beginsearch = 0;
+	    	
+	    	for (int i = 0; i<count;i++) {
+	    		int beginThispolygon = input.toLowerCase().indexOf("polygon", beginsearch);
+	    		
+	            String polygonOverSet = input.substring(beginThispolygon);
+	    		
+	            int begin = polygonOverSet.indexOf("(")+1;
+	            String newPolygon = "";
+	            System.out.println("verifica "+input.substring(beginThispolygon+"polygon".length(), beginThispolygon+begin-1).trim().replaceAll(" +", " "));
+	            if (input.substring(beginThispolygon+"polygon".length(), beginThispolygon+begin-1).trim().replaceAll(" +", " ").length()<2) {
+		            
+		            int open = 1;
+		            char[] full =  polygonOverSet.substring(begin).toCharArray();
+		            int step = 0;
+		            while ((open!=0)&&(step!=full.length)) {
+		            	if (full[step]=='(') {
+		            		open++;
+		            	}
+		            	if (full[step]==')') {
+		            		open--;
+		            	}
+		            	step++;
+		            }
+		            newPolygon = computepolygons(polygonOverSet.substring(0, begin+step));
+		            input = input.substring(0,beginThispolygon)+
+		            		newPolygon+
+		            		polygonOverSet.substring(begin+step);
+	            }else {
+	            	newPolygon = "polygon";
+	            }
+	            
+	            beginsearch =beginThispolygon+newPolygon.length();
+	    	}
+	    	
+	    	
+	    	return input;
+	    }
+	    
+	    public static String computepolygons(String wkt) {
+	    	
+
+	        int totalpolygon = wkt.indexOf("(")+1;
+	        int lastTotalpolygon = wkt.lastIndexOf(")");
+	        String groupOfpolygon = wkt.substring(totalpolygon , lastTotalpolygon);
+	        
+	        int count = StringUtils.countMatches(groupOfpolygon, "(");
+	        ArrayList<String> polygons = new ArrayList<String>();
+	        boolean error =false;
+	        for (int i = 0; i<count;i++) {
+	        	
+	        	int beginpolygon = groupOfpolygon.indexOf("(")+1;
+	            int endpolygon = groupOfpolygon.indexOf(")",beginpolygon);
+	        	String polygon = 
+	        			groupOfpolygon.substring(beginpolygon, endpolygon);
+	        	
+	        	String[] points = polygon.split(",");
+	        	points[0] = points[0].trim().replaceAll(" +", " ");
+	    		points[0] = points[0].startsWith(" ") ? points[0].substring(1) : points[0];
+	    		points[0] = points[0].endsWith(" ") ? points[0].substring(1) : points[0];
+	        	String[] firstcoor = points[0].split(" ");
+	        	if (firstcoor.length>=2) {
+		        	polygon = firstcoor[1]+ " "+ firstcoor[0];
+		        	for (int j = 1; j<points.length;j++) {
+		        		points[j] = points[j].trim().replaceAll(" +", " ");
+		        		points[j] = points[j].startsWith(" ") ? points[j].substring(1) : points[j];
+		        		points[j] = points[j].endsWith(" ") ? points[j].substring(1) : points[j];
+		        		String[] coor = points[j].split(" ");
+		        		if (coor.length>=2) {
+		        			polygon = polygon + ","+coor[1]+ " "+ coor[0];
+		        		}else {error=true;}
+		        	}
+	        	}else {error=true;}
+	        	
+	        	
+	        	polygons.add("("+polygon+")");
+	        	groupOfpolygon = groupOfpolygon.substring(endpolygon+1);
+	        }
+	        String newpolygon = "POLYGON("+StringUtils.join(polygons, ',')+")";
+	        if (error) newpolygon = wkt;
+	        return newpolygon;
+	    }
 	
 }

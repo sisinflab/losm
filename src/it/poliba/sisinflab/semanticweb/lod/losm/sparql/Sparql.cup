@@ -1,0 +1,2708 @@
+package it.poliba.sisinflab.semanticweb.lod.losm.sparl;
+
+/* ----------------------Preliminary Declarations Section--------------------*/
+
+
+import java.io.*;
+import java_cup.runtime.*;
+import java.util.*;
+import java_cup.runtime.Symbol;
+action code{: 
+
+    Map<String , ArrayList<CoarseTriple>> sky = new HashMap<>();
+    
+    ArrayList<FakeError> selectVarsTot= new ArrayList<FakeError>();
+    ArrayList<FakeError> whereVarsTot= new ArrayList<FakeError>();
+    ArrayList<FakeError> solutionVarsTot= new ArrayList<FakeError>();
+    ArrayList<String> selectVarsStr= new ArrayList<String>();
+    ArrayList<String> whereVarsStr= new ArrayList<String>();
+    ArrayList<String> solutionVarsStr= new ArrayList<String>();
+    ArrayList<FakeError> wherePreTot= new ArrayList<FakeError>();
+    ArrayList<FakeError> prefixPreTot= new ArrayList<FakeError>();
+    ArrayList<String> wherePreStr= new ArrayList<String>();
+    ArrayList<String> prefixPreStr= new ArrayList<String>();
+    ArrayList<FakeError> tempTot= new ArrayList<FakeError>();
+    ArrayList<String> tempStr= new ArrayList<String>();
+    ArrayList<FakeError> tempPreTot= new ArrayList<FakeError>();
+    ArrayList<String> tempPreStr= new ArrayList<String>();
+:};
+
+parser code {:
+    public Map<String , ArrayList<String>> getResults(){
+	  return totalResults;
+  }
+    public static Map<String , ArrayList<String>> totalResults;
+    private ArrayList<String> errorList =new ArrayList<String>();
+    public static int errors = 0;
+    // Connect this parser to a scanner!
+    //SparqlLexer s;
+    //SparqlCup(SparqlLexer s){ this.s=s; }
+    SparqlLexer scan= (SparqlLexer)this.getScanner();
+    
+    int lastErrorLine;
+    int lastErrorColumn;
+    String lastErrorWord;
+    String lastErrorBuffer;
+    int lastPos;
+    String lastLineString;
+    
+    public String buildLine(String lastErrorBuffer,int lastPos){
+    	System.out.println(lastPos+"buffer:"+lastErrorBuffer.length());
+	    int end = lastErrorBuffer.indexOf("\n",lastPos);
+	    String sub =lastErrorBuffer.substring(0,lastPos);
+	    int start = sub.lastIndexOf("\n")+1;
+	    System.out.println("start:"+start+"end:"+end);
+	    if (start<0){start=0;}
+    return lastErrorBuffer.substring(start,end);
+    }
+    
+     public void syntax_error(Symbol cur_token) {
+     lastErrorLine =  scan.getLine();
+     lastErrorColumn = scan.getColumn();
+     lastErrorWord = scan.getWord();
+     lastErrorBuffer = new String(scan.getBuffer());
+     lastPos = scan.getCurrentPos();
+     lastLineString = buildLine(lastErrorBuffer,lastPos);
+		 System.out.println("I’m sorry, but I have to ");
+		 System.out.println("report a syntax error.");
+		 System.out.println("The last symbol was: "+ scan.getWord() +
+		 " (See sym.java)");
+		 System.out.println("at line number " + scan.getLine());
+    }
+    
+    public int getNoErrors(){
+    return errorList.size();
+    }
+    public ArrayList<String> getErrors(){
+    return errorList;
+    }
+    
+    public void run(){
+    
+			MapMan manager = new MapMan(action_obj.sky);
+			totalResults = manager.go();
+    }
+      public void report_error(String message, Object info) {
+		    StringBuffer m = new StringBuffer();
+		     if (info instanceof FakeError){
+		     FakeError info2 = (FakeError)info;
+		     
+			    m.append("Error "+"( line: "+info2.getLine());
+			    m.append(" column: "+info2.getColumn());
+			    m.append(" lexeme: "+info2.getWord());
+			    m.append(" ): Syntax Error\n");
+			    m.append(" "+(errorList.size()+1)+" :");
+			    m.append(" "+message+"\n");
+		    }
+		    else {
+			    m.append("Error "+"( line: "+lastErrorLine);
+			    m.append(" column: "+lastErrorColumn);
+			    m.append(" lexeme: "+lastErrorWord);
+			    m.append(" ): Syntax Error\n");
+			    m.append(" "+(errorList.size()+1)+" :");
+			    m.append(" "+message+"\n");
+		    	
+		    }
+		    System.err.println(m);
+		    
+		    
+		     m = new StringBuffer();
+		   
+		     if (info instanceof FakeError){
+		     FakeError info2 = (FakeError)info;
+		     
+			    m.append("Error "+"( line: "+info2.getLine());
+			    m.append(" column: "+info2.getColumn());
+			    m.append(" lexeme: "+info2.getWord());
+			    m.append(" ): Syntax Error\n");
+			    m.append("<br />");
+			    m.append(" "+(errorList.size()+1)+" :");
+			    m.append(" "+message+"\n");
+			    m.append("<br />");
+		    }
+		    else {
+			    m.append("Error "+"( line: "+lastErrorLine);
+			    m.append(" column: "+lastErrorColumn);
+			    m.append(" lexeme: "+lastErrorWord);
+			    m.append(" ): Syntax Error\n");
+			    m.append("<br />");
+			    m.append(" "+(errorList.size()+1)+" :");
+			    m.append(" "+message+"\n");
+			    m.append("<br />");
+		    	
+		    }
+		    errorList.add(m.toString());
+  }
+    
+:}
+
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+
+/* Terminals (tokens returned by the scanner).
+
+   Terminals that have no value are listed first and then terminals
+   that do have an value, in this case an integer value, are listed on
+   the next line down. */
+
+terminal String BASE , PREFIX , SELECT , CONSTRUCT , DESCRIBE , ASK , ORDER , BY , DESC , LIMIT , OFFSET , DISTINCT , REDUCED , FROM , NAMED , WHERE , GRAPH , OPTIONAL , UNION , FILTER , ISA , STR , LANG , LANGMATCHES , DATATYPE , BOUND , SAMETERM , ISURI , ISIRI , ISBLANK , ISLITERAL , REGEX , TRUE , FALSE, NOT , EXISTS , REPLACE , AS , SUBSTR , BNODE , IRI , URI , RAND , ABS , CEIL , FLOOR , ROUND , CONCAT , STRLEN , UCASE , LCASE , ENCODE_FOR_URI , CONTAINS , STRSTARTS , STRENDS , STRBEFORE , STRAFTER , YEAR , MONTH , DAY , HOURS , MINUTES , SECONDS , TIMEZONE , TZ , UUID , STRUUID , MD5 , SHA1 , SHA256 , SHA384 , SHA512 , COALESCE , IF , STRLANG , ISNUMERIC , HAVING , VALUES  , SILENT   , SERVICE , BIND , UNDEF , MINUS , GROUP_CONCAT , SUM , MIN , MAX , COUNT , SAMPLE , AVG , SEPARATOR;
+
+
+terminal String STRDT, NOW, IN, CARET, ASC, GROUP, PARENTHO, PARENTHC, SBRACKETO, SBRACKETC, CBRACKETO, CBRACKETC, EMARK, STAR, DOT, COMMA, SEMICOLON , CARETCARET, PIPE, SLASH, QMARK, DOUBLEPIPE, DOUBLEAMPERSAND, EQUALMARK, LT, GT, DIFFERENT, LEQUAL, GEQUAL, PLUSMARK, MINUSMARK;
+// terminali da valutare
+terminal String PN_PREFIX, CREATE,VARNAME, INTO,PN_LOCAL_ESC, ADD,PN_CHARS_U, OPERATOR, MOVE, USING,PN_CHARS_BASE,EXPONENT, DROP, DELETE,PN_LOCAL,PLX,PERCENT,HEX,PN_CHARS, CLEAR     , COPY , TO , INSERT , DATA  , WITH  , ALL, LOAD, DEFAULT,ECHAR;
+//
+terminal String   IRIREF,PNAME_NS,PNAME_LN,BLANK_NODE_LABEL,VAR1,VAR2,LANGTAG,INTEGER,DECIMAL,DOUBLE,INTEGER_POSITIVE,DECIMAL_POSITIVE,DOUBLE_POSITIVE,INTEGER_NEGATIVE,DECIMAL_NEGATIVE,DOUBLE_NEGATIVE,STRING_LITERAL1,STRING_LITERAL2,STRING_LITERAL_LONG1,STRING_LITERAL_LONG2,NIL,WS,ANON;
+
+/* Non terminals used in the grammar section.
+
+   Non terminals that have an object value are listed first and then
+   non terminals that have an integer value are listed.  An object
+   value means that it can be any type, it isn't set to a specific
+   type.  So it could be an Integer or a String or whatever. */
+
+non terminal FineElement    ObjectPaths, GraphOrTriples, LimitClauseQ,  Prologue ;
+non terminal FineElement    BaseDecl , PrefixDecl ,BaseORPreS,BaseORPres,BaseORPre, SelectQuery , SubSelect ;
+non terminal FineElement    WhereClause , SolutionModifier ;
+non terminal FineElement    OrderClause , OrderCondition , LimitOffsetClauses  ;
+non terminal FineElement    LimitClause , OffsetClause , GroupGraphPattern , GroupGraphPatternSub  ;
+non terminal FineElement    GraphPatternNotTriples ;
+non terminal FineElement    GroupOrUnionGraphPattern , Filter , Constraint , FunctionCall , ArgList , ExpressionList ;
+non terminal FineElement    Verb , ObjectList , Object  ;
+non terminal FineElement    VerbPath , VerbSimple , ObjectListPath , ObjectPath , Path , PathAlternative , PathSequence  ;
+non terminal FineElement    PathElt , PathEltOrInverse , PathMod , PathPrimary , PathNegatedPropertySet , PathOneInPropertySet  , TriplesNode  ;
+non terminal FineElement    BlankNodePropertyList , TriplesNodePath , BlankNodePropertyListPath , Collection , CollectionPath , GraphNode  ;
+non terminal FineElement    GraphNodePath , VarOrIri  , GraphTerm , Expression , ConditionalOrExpression , ConditionalAndExpression  ;
+non terminal FineElement    ValueLogical , RelationalExpression , NumericExpression , AdditiveExpression , MultiplicativeExpression, NumericLiteralUnary, NumericLiteralBoth  ;
+non terminal FineElement    UnaryExpression , PrimaryExpression , BrackettedExpression , BuiltInCall , RegexExpression , SubstringExpression  ;
+non terminal FineElement    StrReplaceExpression , Aggregate , iriOrFunction , RDFLiteral , NumericLiteral  ;
+non terminal FineElement    NumericLiteralUnsigned , NumericLiteralPositive , NumericLiteralNegative , BooleanLiteral , String , iri  ;
+non terminal FineElement    PrefixedName , BlankNode , VarOrExpression ;
+non terminal FineElement    WHEREQ, OrderClauseQ, LimitOffsetClausesQ ;
+non terminal FineElement    OrderConditionP, OffsetClauseQ, TriplesBlockQ ;
+non terminal FineElement    DISTINCTQ, ExpressionS,Expressions, VerbObjQ, VerbObjQS,VerbObjQs, ObjS,Objs ; 
+non terminal FineElement    VerbPathORSimple, VerbPathObjQ,VerbPathObj, VerbPathObjQS,VerbPathObjQs, ObjectPathS, PathSequenceS, PathSequences, PathEltOrInverseS, PathEltOrInverses, PathModQ ;
+non terminal FineElement    PathOneInPropertySetS, PathOneInPropertySetSQ, PathOneInPropertySets, GraphNodeP, GraphNodePathP, ConditionalAndExpressionS, ConditionalAndExpressions ;
+non terminal FineElement    ValueLogicalS, ValueLogicals, UnaryExpressionOR, UnaryExpressionORS, UnaryExpressionORs, NumericUnary, MultiplicativeORExpression ;
+non terminal FineElement    MultiplicativeORExpressionS, MultiplicativeORExpressions;
+//non terminal String Integer, UpdateUnit ,GRAPHQ,SILENTQ,Update , Update1 , Load , Clear , Drop , Create , Add , Move , Copy , InsertData , DeleteData , DeleteWhere , Modify , DeleteClause , InsertClause , UsingClause , GraphOrDefault , GraphRef , GraphRefAll , QuadPattern , QuadData , Quads , QuadsNotTriples, InsertClauseQ, UsingClauseS, QuadsOrTriples;
+non terminal CoarseTriple PropertyListPath  ,ParameterList, ParameterS, Parameters, TriplesSameSubjectPath,TriplesBlock ;
+non terminal FineElement Var, VarOrTerm, Parameter;
+non terminal FineElement PropertyListNotEmpty ;
+non terminal CoarseTriple PropertyListPathNotEmpty, PropertyListPathNotEmptyQ;
+non terminal ArrayList<FineElement> VarOrExpressions,SelectClause;
+non terminal String QueryUnit, Query, BaseDeclQ, PrefixDeclS,PrefixDecls ;
+
+
+precedence nonassoc SELECT;
+precedence left CBRACKETO,CBRACKETC;
+precedence left SBRACKETO,SBRACKETC;
+precedence nonassoc STR, SAMETERM, ISURI, ISIRI, ISBLANK, ISLITERAL, REGEX, REPLACE, SUBSTR, BNODE, IRI;
+precedence nonassoc URI, RAND, ABS, CEIL, FLOOR, ROUND, CONCAT, STRLEN, UCASE, LCASE, ENCODE_FOR_URI, CONTAINS;
+precedence nonassoc STRSTARTS, STRENDS, STRBEFORE, STRAFTER, YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TIMEZONE;
+precedence nonassoc TZ, UUID, STRUUID, MD5, SHA1, SHA256, SHA384, SHA512, COALESCE, IF, STRLANG, ISNUMERIC;
+precedence nonassoc GROUP_CONCAT, SUM, MIN, MAX, COUNT, AVG, STRDT, NOW, EMARK;
+precedence left PARENTHO,PARENTHC;
+precedence left EQUALMARK, DIFFERENT, LT, GT, LEQUAL, GEQUAL, NOT, IN;
+precedence nonassoc DOUBLEAMPERSAND;
+precedence nonassoc COMMA;
+precedence nonassoc SEMICOLON;
+precedence nonassoc PIPE;
+precedence nonassoc SLASH;
+precedence left PLUSMARK, MINUSMARK;
+precedence left STAR, SLASH;
+precedence nonassoc STRING_LITERAL_LONG1, STRING_LITERAL_LONG2;
+precedence nonassoc IRIREF, PNAME_NS, PNAME_LN, VAR1, VAR2, INTEGER, DECIMAL, DOUBLE, STRING_LITERAL1, STRING_LITERAL2;
+precedence nonassoc INTEGER_POSITIVE,DECIMAL_POSITIVE,DOUBLE_POSITIVE,INTEGER_NEGATIVE,DECIMAL_NEGATIVE,DOUBLE_NEGATIVE;
+precedence nonassoc TRUE, FALSE;
+
+start with QueryUnit;
+
+  	QueryUnit	  ::=  	Query
+         {: 
+			System.out.println("parsing done!");
+			
+			System.out.println("\n");
+			Iterator iterator = sky.keySet().iterator();
+  
+				while (iterator.hasNext()) {
+				   String key = iterator.next().toString();
+				   String value = sky.get(key).toString();
+				   System.out.println(key + " " + value);
+			}
+			
+			
+			RESULT=new String("exit");
+			
+			if (selectVarsStr.size()!=0){System.out.println("selectVars: "+selectVarsStr.toString());}			
+			if (whereVarsStr.size()!=0){System.out.println("whereVars: "+whereVarsStr.toString());}
+			if (solutionVarsStr.size()!=0){System.out.println("solutionVars: "+solutionVarsStr.toString());}
+			Iterator iteratorVars = selectVarsStr.iterator();
+  
+			while (iteratorVars.hasNext()) {
+				   String value = (String)iteratorVars.next();
+				   if (whereVarsStr.contains(value)){
+				   }else{
+							   
+						 parser.report_error("Error in SelectClause: "+value+" is not in WhereClause", selectVarsTot.get(selectVarsStr.indexOf(value)) ); 
+						 System.out.println("Error in SelectClause: "+value+" is not in WhereClause");
+				   }
+			}
+			iteratorVars = solutionVarsStr.iterator();
+  
+			while (iteratorVars.hasNext()) {
+				   String value = (String)iteratorVars.next();
+				   if (whereVarsStr.contains(value)){
+				   }else{
+							   
+						 parser.report_error("Error in SolutionModifier: "+value+" is not in WhereClause", solutionVarsTot.get(solutionVarsStr.indexOf(value)) );
+						 System.out.println("Error in SolutionModifier: "+value+" is not in WhereClause");
+				   }
+			}
+			
+					
+			if (wherePreStr.size()!=0){System.out.println("wherePreStr: "+wherePreStr.toString());}
+			if (prefixPreStr.size()!=0){System.out.println("prefixPreStr: "+prefixPreStr.toString());}
+			iteratorVars = wherePreStr.iterator();
+  
+			while (iteratorVars.hasNext()) {
+				   String value = (String)iteratorVars.next();
+				   if (prefixPreStr.contains(value)){
+				   }else{
+							   
+						 parser.report_error("Error in WhereClause: "+value+" has not declared in Prologue", wherePreTot.get(wherePreStr.indexOf(value)) ); 
+						 System.out.println("Error in WhereClause: "+value+" has not declared in Prologue");
+				   }
+			}
+         :}|
+         {: 
+		     SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			 parser.report_error("Error in QueryUnit, Query expected", nut );
+			System.out.println("Error in QueryUnit");
+         :} ;  
+//MODIFIED QUERY
+  	Query	  ::=  	Prologue SelectQuery
+         {: 
+			System.out.println("Query");
+			
+         :} 
+         |
+         Prologue
+         {: 
+		     SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			 FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			 parser.report_error("Error in Query, SelectQuery expected", nut );
+			System.out.println("Error in Query");
+         :} 
+         | SelectQuery
+         {: 
+			System.out.println("Query");
+         :}
+         ;  
+         
+         Prologue	  ::=  	BaseORPreS
+         {: 
+			System.out.println("Prologue");
+			
+			
+			prefixPreTot = new ArrayList<FakeError>(tempPreTot);
+			prefixPreStr = new ArrayList<String>(tempPreStr);
+			tempPreTot  = new ArrayList<FakeError>();
+			tempPreStr  = new ArrayList<String>();
+         :};  
+         
+         BaseORPre  ::= BaseDecl
+         |
+         PrefixDecl
+         |  
+         error:e
+         {: 
+			 parser.report_error("Error in Prologue, BASE or PREFIX expected", e );
+			System.out.println("Error in Prologue");
+
+         :}
+         ;
+         
+         BaseORPreS  ::= BaseORPres
+         ;
+         
+         BaseORPres  ::=  BaseORPre
+         |
+         BaseORPre BaseORPres
+         ;
+   
+  	BaseDecl	  ::=  	BASE IRIREF
+         {: 
+			System.out.println("BaseDecl");
+
+         :}| BASE error:e
+         {: 
+			 parser.report_error("Error in BaseDecl, IRIREF expected", e );
+			System.out.println("Error in BaseDecl");
+
+         :} ;  
+ 
+  	PrefixDecl	  ::=  	PREFIX PNAME_NS:a IRIREF
+         {: 
+			System.out.println("prefix block");
+			
+            if (tempPreStr.contains(a.toString())){
+            
+            }
+            else {
+            
+		     	SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+				FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            	tempPreTot.add(nut);
+            	tempPreStr.add(a.toString());
+            	System.out.println("prefix vector updated");
+            }
+         :}
+         | 
+         PREFIX error:e
+         {: 
+			 parser.report_error("Error in PREFIX, PNAME_NS expected", e );
+			System.out.println("Error in PREFIX");
+
+         :} 
+         | 
+         PREFIX PNAME_NS:a error:e
+         {: 
+			 parser.report_error("Error in PREFIX, IRIREF expected", e );
+			System.out.println("Error in PREFIX");
+			
+            if (tempPreStr.contains(a.toString())){
+            
+            }
+            else {
+            
+		     	SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+				FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            	tempPreTot.add(nut);
+            	tempPreStr.add(a.toString());
+            	System.out.println("prefix vector updated");
+            }
+
+         :}  
+         ;  
+
+
+
+  	SelectQuery	  ::=  	 
+         SelectClause WhereClause SolutionModifier
+         {: 
+			System.out.println("SelectQuery");
+			
+			
+         :}  
+         |
+         SelectClause WhereClause error:e
+         {: 
+			 parser.report_error("Error in SolutionModifier, OrderClause error", null );
+			System.out.println("Error in SolutionModifier");
+			
+         :}   
+         |
+         SelectClause WhereClause
+         {: 
+			System.out.println("SelectQuery");
+			
+         :}  
+         |
+         SelectClause error:e 
+         {: 
+			parser.report_error("Error in SelectQuery, WhereClause missing", null );
+			System.out.println("EError in SelectQuery, WhereClause missing");
+			
+         :} SolutionModifier
+            | 
+         WhereClause error:e
+         {: 
+			parser.report_error("Error in SelectQuery, SelectClause missing", null );
+			System.out.println("Error in SelectQuery, SelectClause missing");
+			
+			
+         :} 
+          |  WhereClause SolutionModifier
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Error in SelectQuery, SelectClause missing", nut );
+			System.out.println("Error in SelectQuery, SelectClause missing");
+			
+			
+         :}
+         |
+         SelectClause error:e
+         {: 
+			 parser.report_error("Error in SelectQuery, WhereClause error", null );
+			System.out.println("EError in SelectQuery, WhereClause error");
+			
+         :} 
+       
+         |	
+  		SelectClause 
+         {: 
+			 parser.report_error("Error in SelectQuery, WhereClause error", null );
+			System.out.println("EError in SelectQuery, WhereClause error");
+			
+         :}         
+      
+                  
+         | WhereClause
+         
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Error in SelectQuery, SelectClause missing", nut );
+			System.out.println("Error in SelectQuery, SelectClause missing");
+			
+			
+         :} 
+         ;  
+
+
+
+
+
+
+
+
+  	SubSelect	  ::=  	SelectClause WhereClause SolutionModifier
+         {: 
+			System.out.println("SubSelect");
+
+         :} 
+         ;  
+
+
+  	SelectClause	  ::=  	SELECT DISTINCT  VarOrExpressions:a
+         {: 
+         	ArrayList<FineElement> exitvalue = new ArrayList<FineElement>();
+			exitvalue.addAll(a);
+			ResultMap.selectList = exitvalue;
+			selectVarsTot = new ArrayList<FakeError>(tempTot);
+			selectVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+
+         :} 
+         ;  
+         
+	VarOrExpressions  ::=   VarOrExpression:a
+	 {: 
+	 		ArrayList<FineElement> exitvalue = new ArrayList<FineElement>();
+	 		exitvalue.add(a);
+	 		RESULT=exitvalue;
+
+         :} 
+         ;
+         
+	VarOrExpressions  ::=  VarOrExpression:b VarOrExpressions:a 
+	 {: 
+			ArrayList<FineElement> exitvalue = new ArrayList<FineElement>();
+			exitvalue.addAll(a);
+			exitvalue.add(b);
+	 		RESULT=exitvalue;
+         :} 
+         ; 
+          
+	VarOrExpression   ::=   Var:a
+	 {: 
+			System.out.println("VarOrExpression: "+a.getContent());
+			RESULT=new FineElement(a);
+
+         :} 
+         ;
+         
+	VarOrExpression   ::=   PARENTHO Expression AS Var PARENTHC
+	 {: 
+			System.out.println("VarOrExpression");
+
+         :} 
+         ;
+
+  	SelectClause	  ::=  	SELECT:e DISTINCT  STAR 
+         {: 
+				System.out.println("SelectClause");
+			selectVarsTot = new ArrayList<FakeError>(tempTot);
+			selectVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+         :} 
+         ;  
+
+  	SelectClause	  ::=  	SELECT VarOrExpressions:a
+         {: 
+         	ArrayList<FineElement> exitvalue = new ArrayList<FineElement>();
+			exitvalue.addAll(a);
+			ResultMap.selectList = exitvalue;
+			selectVarsTot = new ArrayList<FakeError>(tempTot);
+			selectVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+
+         :} 
+         ;  
+
+  	SelectClause	  ::=  	SELECT STAR
+         {: 
+			System.out.println("SelectClause");
+			
+			selectVarsTot = new ArrayList<FakeError>(tempTot);
+			selectVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+         :} 
+         ;
+         
+    SelectClause	  ::=  	SELECT error:e
+         {: 
+			 parser.report_error("Error in SelectClause, vars or star expected", null );
+			System.out.println("Error in SelectClause");
+			
+			selectVarsTot = new ArrayList<FakeError>(tempTot);
+			selectVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+         :} 
+         ;  
+
+  	WhereClause	  ::=  	WHERE:ww  GroupGraphPattern
+         {: 
+         	System.out.println(ww);
+			System.out.println("WhereClause");
+			
+			whereVarsTot = new ArrayList<FakeError>(tempTot);
+			whereVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+			wherePreTot = new ArrayList<FakeError>(tempPreTot);
+			wherePreStr = new ArrayList<String>(tempPreStr);
+			tempPreTot  = new ArrayList<FakeError>();
+			tempPreStr  = new ArrayList<String>();
+         :} 
+         |
+          GroupGraphPattern
+         {: 
+			System.out.println("WhereClause");
+			
+			whereVarsTot = new ArrayList<FakeError>(tempTot);
+			whereVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+			wherePreTot = new ArrayList<FakeError>(tempPreTot);
+			wherePreStr = new ArrayList<String>(tempPreStr);
+			tempPreTot  = new ArrayList<FakeError>();
+			tempPreStr  = new ArrayList<String>();
+         :}  
+        |
+         WHERE:ww  error:e
+         {: 
+             System.out.println(ww);
+			 parser.report_error("Error in WhereClause, GroupGraphPattern error in brackets", null );
+			 System.out.println("Error in GroupGraphPattern");
+			
+			whereVarsTot = new ArrayList<FakeError>(tempTot);
+			whereVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+			wherePreTot = new ArrayList<FakeError>(tempPreTot);
+			wherePreStr = new ArrayList<String>(tempPreStr);
+			tempPreTot  = new ArrayList<FakeError>();
+			tempPreStr  = new ArrayList<String>();
+         :} ;  
+         
+         
+	WHEREQ            ::=   WHERE
+         {: 
+				System.out.println("WHEREQ");
+	
+         :} 
+         |
+         ;  
+
+
+  	SolutionModifier	  ::=  	OrderClause LimitOffsetClauses
+         {: 
+			System.out.println("SolutionModifier");
+			
+			solutionVarsTot = new ArrayList<FakeError>(tempTot);
+			solutionVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+         :}
+         |
+         	OrderClause 
+         {: 
+			System.out.println("SolutionModifier");
+			
+			solutionVarsTot = new ArrayList<FakeError>(tempTot);
+			solutionVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+
+         :}
+         |
+         	LimitOffsetClauses
+         {: 
+			System.out.println("SolutionModifier");
+			solutionVarsTot = new ArrayList<FakeError>(tempTot);
+			solutionVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+
+         :} 
+         |
+         	OrderClause error:e
+         {: 
+			 parser.report_error("Error in SolutionModifier, LimitOffsetClauses error", null );
+			System.out.println("Error in SolutionModifier");
+			
+			solutionVarsTot = new ArrayList<FakeError>(tempTot);
+			solutionVarsStr = new ArrayList<String>(tempStr);
+			tempTot  = new ArrayList<FakeError>();
+			tempStr  = new ArrayList<String>();
+         :}
+         ;  
+	OrderClauseQ      ::=   OrderClause
+         {: 
+			System.out.println("OrderClauseQ");
+
+         :} 
+         |
+         ;  
+	LimitOffsetClausesQ  ::=  LimitOffsetClauses
+         {: 
+			System.out.println("LimitOffsetClausesQ");
+
+         :} 
+         |
+         ;  
+
+
+  	OrderClause	  ::=  	ORDER BY OrderConditionP
+         {: 
+			System.out.println("OrderClause");
+
+         :} 
+         |
+          ORDER BY  error:e
+         {: 
+			 parser.report_error("Error in OrderClause, OrderCondition error", null );
+			System.out.println("Error in OrderClause");
+         :} 
+         |
+          ORDER  error:e
+         {: 
+			 parser.report_error("Error in OrderClause, OrderCondition error", null );
+			System.out.println("Error in OrderClause");
+         :} 
+         |
+          ORDER  OrderConditionP
+         {: 
+			 parser.report_error("Error in OrderClause, BY missing", null );
+			System.out.println("Error in OrderClause");
+         :} 
+         |
+         BY OrderConditionP
+         {: 
+			 parser.report_error("Error in OrderClause, ORDER missing", null );
+			System.out.println("Error in OrderClause");
+
+         :}
+         |
+          error:e BY OrderConditionP
+         {: 
+			 parser.report_error("Error in OrderClause, ORDER wrong", null );
+			System.out.println("Error in OrderClause");
+
+         :} ;  
+         
+	OrderConditionP    ::=   OrderCondition
+         {: 
+			System.out.println("OrderConditionP");
+
+         :} ;  
+	OrderConditionP    ::=  OrderCondition OrderConditionP 
+         {: 
+			System.out.println("OrderConditionP");
+
+         :} ;  
+
+  	OrderCondition	  ::=  	ASC BrackettedExpression 
+         {: 
+			System.out.println("OrderCondition");
+
+         :} 
+         | 	
+         DESC BrackettedExpression 
+         {: 
+			System.out.println("OrderCondition");
+
+         :} 
+         |	
+         Constraint 
+         {: 
+			System.out.println("OrderCondition");
+
+         :} 
+         |  	 
+         Var 
+         {: 
+			System.out.println("OrderCondition");
+
+         :}
+         |
+         ASC error:e 
+         {: 
+			 parser.report_error("Error in OrderCondition, BrackettedExpression error", null );
+			System.out.println("Error in OrderCondition");
+
+         :} 
+         | 	
+         DESC error:e  
+         {: 
+			 parser.report_error("Error in OrderCondition, BrackettedExpression error", null );
+			System.out.println("Error in OrderCondition");
+
+         :} 
+         ;  
+
+  	LimitOffsetClauses	  ::=  	LimitClause
+         {: 
+			System.out.println("LimitOffsetClauses");
+
+         :} 
+         |
+         LimitClause OffsetClause
+         {: 
+			System.out.println("LimitOffsetClauses");
+
+         :}
+         |
+         OffsetClause
+         {: 
+			System.out.println("LimitOffsetClauses");
+
+         :} 
+         |
+          OffsetClause LimitClause
+         {: 
+			System.out.println("LimitOffsetClauses");
+
+         :}
+         ;  
+         
+	OffsetClauseQ             ::=   OffsetClause
+         {: 
+			System.out.println("OffsetClauseQ");
+
+         :} 
+         |
+         ;  
+   
+         
+	LimitClauseQ              ::=   LimitClause
+         {: 
+			System.out.println("LimitClauseQ");
+
+         :} 
+         |
+         ;  
+
+
+  	LimitClause	  ::=  	LIMIT{: 
+			System.out.println("LimitClause");
+				
+         :} INTEGER:i
+         {: 
+			System.out.println(i.toString());
+				
+         :} 
+         |
+         LIMIT
+         {: 
+		     SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			 parser.report_error("Error in LimitClause, LIMIT value missing", nut );
+			System.out.println("Error in LimitClause");
+				
+         :} 
+         |
+         LIMIT error:e
+         {: 
+			 parser.report_error("Error in LimitClause, LIMIT value is not an integer", null );
+			System.out.println("Error in LimitClause");
+				
+         :}
+         ;  
+
+
+  	OffsetClause	  ::=  	OFFSET INTEGER
+         {: 
+			System.out.println("OffsetClause");
+
+         :} 
+         |
+         OFFSET error:e
+         {: 
+			 parser.report_error("Error in OffsetClause, OFFSET value is not an integer", null );
+			System.out.println("Error in OffsetClause");
+
+         :} 
+         |
+         OFFSET 
+         {: 
+		     SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			 parser.report_error("Error in OffsetClause, OFFSET value missing", nut );
+			System.out.println("Error in OffsetClause");
+
+         :} 
+         ;  
+
+
+
+  	GroupGraphPattern	  ::=  	CBRACKETO  SubSelect  
+         {: 
+			System.out.println("GroupGraphPattern");
+
+         :} CBRACKETC
+         |
+           	CBRACKETO GroupGraphPatternSub:g  
+         {: 
+			System.out.println("GroupGraphPattern");
+         :} CBRACKETC
+         |
+           	CBRACKETO error:e  
+         {: 
+            parser.report_error("Error in GroupGraphPattern, GroupGraphPatternSub or SubSelect wrong", null );
+			System.out.println("Error in GroupGraphPattern");
+         :} CBRACKETC
+          |
+           	CBRACKETO   CBRACKETC
+         {: 
+		     SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            parser.report_error("Error in GroupGraphPattern, GroupGraphPattern  empty", nut );
+			System.out.println("Error in GroupGraphPattern");
+         :}
+        //prova 23 luglio la regola funziona ma con } group sbaglia la valutazione
+         | 
+         CBRACKETO  error:e
+         {: 
+            parser.report_error("Error in WhereClause closure", null );
+			System.out.println("Error in WhereClause closure");
+         :}
+         
+         ;  
+
+
+  	GroupGraphPatternSub	  ::=   GraphOrTriples
+         {: 
+			System.out.println("GroupGraphPatternSub");
+
+         :} 
+         |
+         TriplesBlock GraphOrTriples
+         {: 
+			System.out.println("GroupGraphPatternSub");
+
+         :}
+         |
+         TriplesBlock 
+         {: 
+			System.out.println("GroupGraphPatternSub");
+
+         :} ;  
+         //ho sostituito nella seguente TriplesBlockQ con TriplesBlock
+	GraphOrTriples ::= GraphOrTriples GraphPatternNotTriples DOT TriplesBlock
+         {: 
+			System.out.println("GraphOrTriples");
+
+         :} 
+         |
+          GraphOrTriples GraphPatternNotTriples  TriplesBlock
+         {: 
+			System.out.println("GraphOrTriples");
+
+         :} 
+         | 
+         GraphPatternNotTriples DOT TriplesBlock
+         {: 
+			System.out.println("GraphOrTriples");
+
+         :} 
+         | 
+         GraphPatternNotTriples  TriplesBlock
+         {: 
+			System.out.println("GraphOrTriples");
+
+         :} 
+         ;  
+         
+         
+	TriplesBlockQ  ::= TriplesBlock
+         {: 
+			System.out.println("TriplesBlockQ");
+         :} 
+         | 
+         {: 
+			System.out.println("finished");
+         :} ;  
+
+     	TriplesBlock	  ::=  	TriplesSameSubjectPath:a 
+         {: 
+         
+			System.out.println("TRIPLESBLOCK2");
+					    CoarseTriple exitvalue = new CoarseTriple();
+		    exitvalue.addElement(a);
+			System.out.println("TriplesBlock: "+exitvalue.toString());
+			
+			
+			 if(sky.containsKey(exitvalue.get(0)))
+			{
+			ArrayList<CoarseTriple> modList = sky.get(exitvalue.get(0));
+			modList.add(exitvalue);
+			sky.put(exitvalue.get(0),modList);
+			}else{
+			ArrayList<CoarseTriple> listSameVar = new ArrayList<CoarseTriple>();
+			listSameVar.add(exitvalue);
+			sky.put(exitvalue.get(0),listSameVar);
+			}
+			RESULT=exitvalue;
+         :}
+         |
+          TriplesSameSubjectPath:a  DOT:d 
+         {: 
+			
+			System.out.println(d.toString());
+		    CoarseTriple exitvalue = new CoarseTriple();
+		    exitvalue.addElement(a);
+			System.out.println("TriplesBlock: "+exitvalue.toString());
+			
+			
+			 if(sky.containsKey(exitvalue.get(0)))
+			{
+			ArrayList<CoarseTriple> modList = sky.get(exitvalue.get(0));
+			modList.add(exitvalue);
+			sky.put(exitvalue.get(0),modList);
+			}else{
+			ArrayList<CoarseTriple> listSameVar = new ArrayList<CoarseTriple>();
+			listSameVar.add(exitvalue);
+			sky.put(exitvalue.get(0),listSameVar);
+			}
+			
+			RESULT=exitvalue;
+         :} 
+         |
+         TriplesSameSubjectPath:a   DOT:d TriplesBlock 
+         {: 
+         	
+			System.out.println(d.toString());
+			System.out.println("dotTRIPLESBLOCK");
+			
+		    CoarseTriple exitvalue = new CoarseTriple();
+		    exitvalue.addElement(a);
+			System.out.println("TriplesBlock: "+exitvalue.toString());
+			
+			
+			 if(sky.containsKey(exitvalue.get(0)))
+			{
+			ArrayList<CoarseTriple> modList = sky.get(exitvalue.get(0));
+			modList.add(exitvalue);
+			sky.put(exitvalue.get(0),modList);
+			}else{
+			ArrayList<CoarseTriple> listSameVar = new ArrayList<CoarseTriple>();
+			listSameVar.add(exitvalue);
+			sky.put(exitvalue.get(0),listSameVar);
+			}
+			
+			RESULT=exitvalue;
+         :}
+          ;  
+         
+  	GraphPatternNotTriples	  ::=  	GroupOrUnionGraphPattern
+         {: 
+			System.out.println("GraphPatternNotTriples");
+
+         :} ;
+         
+	GraphPatternNotTriples	  ::=  	Filter
+         {: 
+			System.out.println("GraphPatternNotTriples");
+
+         :} ;
+         //modified
+  	GroupOrUnionGraphPattern	  ::=  	GroupGraphPattern 
+         {: 
+			System.out.println("GroupOrUnionGraphPattern");
+
+         :} ;  
+
+		 
+  	Filter	  ::=  	FILTER Constraint
+         {: 
+			System.out.println("Filter: Rule translation not supported in this Demo Version");
+       
+
+         :} ;  
+
+
+  	Constraint	  ::=  	BrackettedExpression
+         {: 
+			System.out.println("Constraint: Rule translation not supported in this Demo Version");
+       
+         :} ;
+
+	Constraint	  ::=  	BuiltInCall
+         {: 
+			System.out.println("Constraint: Rule translation not supported in this Demo Version");
+       
+         :} ;		 
+
+	Constraint	  ::=  	FunctionCall
+         {: 
+			System.out.println("Constraint: Rule translation not supported in this Demo Version");
+       
+         :} ;
+
+  	FunctionCall	  ::=  	iri ArgList
+         {: 
+			System.out.println("FunctionCall: Rule translation not supported in this Demo Version");
+       :} ;  
+
+
+  	ArgList	  ::=  	NIL
+         {: 
+			System.out.println("ArgList");
+
+         :} ;
+
+	ArgList	  ::=  	PARENTHO DISTINCTQ Expression ExpressionS PARENTHC
+         {: 
+			System.out.println("ArgList");
+
+         :} ;
+	DISTINCTQ ::= DISTINCT
+         {: 
+			System.out.println("DISTINCTQ");
+
+         :} |;
+    ExpressionS ::= Expressions
+         |
+         %prec COMMA;
+         
+	Expressions ::= COMMA Expression
+         {: 
+			System.out.println("ExpressionS");
+
+         :}
+         |   COMMA Expression Expressions
+         {: 
+			System.out.println("ExpressionS");
+
+         :}
+         | COMMA error:e 
+         {: 
+            parser.report_error("Error in Expressions, error in comma delimiter object", null );
+			System.out.println("Error in Expressions");
+
+         :} 
+         |
+           COMMA error:e  Expressions
+         {: 
+            parser.report_error("Error in Expressions, error in middle of comma delimiter object", null );
+			System.out.println("Error in Expressions");
+
+         :}
+         ;
+         
+  	ExpressionList	  ::=  	NIL
+         {: 
+			System.out.println("ExpressionList");
+
+         :} ;
+
+	ExpressionList	  ::=  	PARENTHO Expression ExpressionS PARENTHC
+         {: 
+			System.out.println("ExpressionList");
+
+         :} ;
+         
+
+  	PropertyListNotEmpty	  ::=  	Verb ObjectList
+         {: 
+			System.out.println("PropertyListNotEmpty");
+
+         :}
+         |
+         Verb ObjectList VerbObjQS
+         {: 
+			System.out.println("PropertyListNotEmpty");
+
+         :} ;  
+	VerbObjQ  ::= Verb ObjectList
+         {: 
+			System.out.println("VerbObjQ");
+
+         :} 
+         ;
+    VerbObjQS ::= VerbObjQs 
+    	;
+    
+	VerbObjQs ::=   SEMICOLON VerbObjQ
+         {: 
+			System.out.println("VerbObjQS");
+
+         :} 
+         |
+          SEMICOLON VerbObjQ VerbObjQs
+         {: 
+			System.out.println("VerbObjQS");
+
+         :}
+         | SEMICOLON error:e 
+         {: 
+            parser.report_error("Error in VerbObjQs, error in SEMICOLON delimiter object", null );
+			System.out.println("Error in VerbObjQs");
+
+         :} 
+         |
+           SEMICOLON error:e  VerbObjQs
+         {: 
+            parser.report_error("Error in VerbObjQs, error in middle of SEMICOLON delimiter object", null );
+			System.out.println("Error in VerbObjQs");
+
+         :}
+         %prec SEMICOLON;
+         
+  	Verb	  ::=  	VarOrIri
+         {: 
+			System.out.println("Verb");
+
+         :} ;
+
+	Verb	  ::=  	ISA
+         {: 
+			System.out.println("Verb");
+
+         :} ;
+
+  	ObjectList	  ::=  	Object ObjS
+         {: 
+			System.out.println("ObjectList");
+
+         :} ;
+	ObjS ::=    Objs
+		|		
+         %prec COMMA; 
+	
+	Objs ::=  COMMA Object
+         {: 
+			System.out.println("ObjS");
+
+         :} 
+         |
+         COMMA Object Objs
+         {: 
+			System.out.println("ObjS");
+
+         :}
+         | COMMA error:e 
+         {: 
+            parser.report_error("Error in Objs, error in COMMA delimiter object", null );
+			System.out.println("Error in Objs");
+
+         :} 
+         |
+           COMMA error:e  Objs
+         {: 
+            parser.report_error("Error in Objs, error in middle of COMMA delimiter object", null );
+			System.out.println("Error in Objs");
+
+         :} ;
+
+  	Object	  ::=  	GraphNode
+         {: 
+			System.out.println("Object");
+
+         :} ;
+
+  	TriplesSameSubjectPath	  ::=  	VarOrTerm:a 
+  	{: 
+  
+			System.out.println("TriplesSameSubjectPath: "+a.toString());
+			System.out.println("TriplesSameSubjectPath first class");
+         :} PropertyListPathNotEmpty:b
+         {: 
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+	     exitvalue.addElement(b);
+			System.out.println("TriplesSameSubjectPath: "+exitvalue.toString());
+			System.out.println("TriplesSameSubjectPath second class");
+			
+		RESULT=exitvalue;
+         
+         :}
+         | 	TriplesNodePath  
+		{: 
+
+			
+			System.out.println("TriplesSameSubjectPath first class");
+         :} PropertyListPath:a
+         {: 
+
+			System.out.println("PropertyListPathUP: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+			System.out.println("TriplesSameSubjectPath second class");
+         :} 
+         | 
+         TriplesNodePath  
+		{: 
+
+			
+         :} error:e
+         {: 
+            parser.report_error("Error in TriplesSameSubjectPath, verbobject error", null );
+			System.out.println("Error in TriplesSameSubjectPath");
+
+         :}
+         | 
+         VarOrTerm:a  
+		{: 
+
+			System.out.println("TriplesSameSubjectPath: "+a.toString());
+			System.out.println("TriplesSameSubjectPath first class");
+			
+         :} error:e
+         {: 
+            parser.report_error("Error in TriplesSameSubjectPath, verbobject error", null );
+			System.out.println("Error in TriplesSameSubjectPath");
+
+         :}
+         | 
+         VarOrTerm:a  
+		{: 
+		     SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            parser.report_error("Error in TriplesSameSubjectPath, just subject error", nut );
+			System.out.println("Error in TriplesSameSubjectPath");
+	        CoarseTriple exitvalue = new CoarseTriple();
+	        exitvalue.addElement(a);
+	        exitvalue.addElement(a);
+			System.out.println("TriplesSameSubjectPath: "+exitvalue.toString());
+			System.out.println("TriplesSameSubjectPath second class");
+			
+		    RESULT=exitvalue;
+			
+         :};
+
+	PropertyListPath	  ::=  	PropertyListPathNotEmptyQ:a
+         {: 
+			System.out.println("PropertyListPath: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+
+         :} ;  
+	PropertyListPathNotEmptyQ ::=   PropertyListPathNotEmpty:a
+         {: 
+			System.out.println("PropertyListPathNotEmptyQ: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+
+         :} 
+         |
+         ;  
+
+//added for spatial
+
+         
+     ParameterList	  ::=  	PARENTHO ParameterS:a PARENTHC
+     {: 
+	     System.out.println("PropertyListPathNotEmpty: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+
+         :} 
+         ;
+     ParameterS  ::= Parameters:a 
+     	{: 
+	     System.out.println("PropertyListPathNotEmpty: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+
+         :} 
+     	|
+     	;
+         
+         
+     Parameters	  ::=  	Parameter:a  
+     {: 
+	     System.out.println("ParameterSsingle: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+
+         :}
+         |
+         	Parameter:a
+     {: 
+	     System.out.println("ParameterS1: "+a.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+		RESULT=exitvalue;
+
+         :} Parameters:b 
+     {: 
+	     System.out.println("ParameterS2: "+b.toString());
+	     CoarseTriple exitvalue = new CoarseTriple();
+	     exitvalue.addElement(a);
+	     exitvalue.addElement(b);
+		RESULT=exitvalue;
+
+         :}
+         | error:e 
+         {: 
+            parser.report_error("Error in Parameters", null );
+			System.out.println("Error in Parameters");
+
+         :} 
+         |
+           error:e  Parameters:b
+         {: 
+            parser.report_error("Error in Parameters, error in middle of Parameters", null );
+			System.out.println("Error in Parameters");
+
+         :}  ;
+         
+     Parameter	  ::=  	NumericLiteral:a
+     {: 
+	     System.out.println("Parameter: "+a.toString());
+		RESULT=new FineElement(a);
+
+         :} | Var:a
+         {: 
+	     System.out.println("Parameter: "+a.toString());
+		RESULT=new FineElement(a);
+
+         :} | String:a
+         {: 
+	     System.out.println("Parameter: "+a.toString());
+		RESULT=new FineElement(a);
+
+         :} ;
+        
+         
+	PropertyListPathNotEmpty	  ::=  	VerbPathORSimple:a {: 
+			System.out.println("PropertyListPathNotEmpty: "+a.toString());
+		     CoarseTriple exitvalue = new CoarseTriple();
+		     exitvalue.addElement(a);
+			RESULT=exitvalue;
+
+         :} ObjectListPath:b  {: 
+
+
+         
+			System.out.println("PropertyListPathNotEmpty: "+b.toString());
+				
+		     CoarseTriple exitvalue = new CoarseTriple();
+		     exitvalue.addElement(a);
+		     exitvalue.addElement(b);
+			RESULT=exitvalue;
+		     
+         :}
+         VerbPathObjQS
+         {: 
+
+			System.out.println("PropertyListPathNotEmpty");
+
+         :}
+         | VerbPathORSimple:a ParameterList:b  {: 
+
+			System.out.println("PropertyListPathNotEmpty: "+b.toString());
+				
+		     CoarseTriple exitvalue = new CoarseTriple();
+		     exitvalue.addElement(a);
+		     exitvalue.addElement(b);
+			RESULT=exitvalue;
+			
+			
+         :} VerbPathObjQS
+         {: 
+
+			System.out.println("PropertyListPathNotEmpty");
+
+         :} 
+         |
+         VerbPathORSimple:a error:e
+         {: 
+		     CoarseTriple exitvalue = new CoarseTriple();
+		     exitvalue.addElement(a);
+		     FineElement b = new FineElement("placeholder","WORD");
+		     exitvalue.addElement(b);
+            parser.report_error("Error in PropertyListPathNotEmpty, object or end of triple error", null );
+			System.out.println("Error in PropertyListPathNotEmpty");
+			
+			RESULT=exitvalue;
+
+         :}
+         ;  
+         
+         
+//added for spatial end
+         
+    VerbPathObjQS  ::= VerbPathObjQs
+    	|
+    	%prec SEMICOLON;
+    	
+	VerbPathObjQs     ::= SEMICOLON VerbPathObj 
+         {: 
+			System.out.println("VerbPathObjQS");
+
+         :} 
+         |
+           SEMICOLON VerbPathObj VerbPathObjQs
+         {: 
+			System.out.println("VerbPathObjQS");
+
+         :} 
+         | SEMICOLON error:e 
+         {: 
+            parser.report_error("Error in VerbPathObjQs, error in semicolon delimiter object", null );
+			System.out.println("Error in VerbPathObjQs");
+
+         :} 
+         |
+           SEMICOLON error:e  VerbPathObjQs
+         {: 
+            parser.report_error("Error in VerbPathObjQs, error in middle of semicolon delimiter object", null );
+			System.out.println("Error in VerbPathObjQs");
+
+         :} ;  
+
+
+    VerbPathObj      ::= VerbPathORSimple ObjectList
+         {: 
+			System.out.println("VerbPathObjQ");
+
+         :} 
+         ;  
+	VerbPathORSimple  ::= VerbPath:a
+         {: 
+			System.out.println("VerbPathORSimple: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} 
+		|
+		 VerbSimple
+         {: 
+			System.out.println("VerbPathORSimple");
+
+         :} ;  
+
+
+  	VerbPath	  ::=  	Path:a
+         {: 
+			System.out.println("VerbPath: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;  
+
+
+  	VerbSimple	  ::=  	Var
+         {: 
+			System.out.println("VerbSimple");
+
+         :} ;  
+
+	ObjectListPath	  ::=  	ObjectPath:a 
+		{: 
+
+         
+			System.out.println("ObjectListPath: "+a.toString());
+			RESULT=new FineElement(a);
+         :} 
+         |
+         ObjectPath:a 
+		{: 
+
+         
+			System.out.println("ObjectListPath: "+a.toString());
+			RESULT=new FineElement(a);
+         :} ObjectPathS
+         {: 
+			System.out.println("ObjectListPath");
+
+         
+         :} ;  
+    ObjectPathS  ::= ObjectPaths
+	    %prec COMMA;
+	    
+	ObjectPaths	  ::=  	COMMA ObjectPath 
+         {: 
+			System.out.println("ObjectPathS");
+
+         :} 
+         |
+           COMMA ObjectPath ObjectPaths
+         {: 
+			System.out.println("ObjectPathS");
+
+         :} 
+         
+         | COMMA error:e 
+         {: 
+            parser.report_error("Error in ObjectPaths, error in comma delimiter object", null );
+			System.out.println("Error in ObjectPaths");
+
+         :} 
+         |
+           COMMA error:e  ObjectPaths
+         {: 
+            parser.report_error("Error in ObjectPaths, error in middle of comma delimiter object", null );
+			System.out.println("Error in ObjectPaths");
+
+         :};  
+
+  	ObjectPath	  ::=  	GraphNodePath:a
+         {: 
+
+         
+			System.out.println("ObjectPath: "+a.toString());
+			RESULT=new FineElement(a);
+         :} ;  
+
+
+  	Path	  ::=  	PathAlternative:a
+         {: 
+			System.out.println("Path: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;  
+
+
+	PathAlternative	  ::=  	PathSequence:a 
+	{: 
+			System.out.println("PathAlternative: "+a.toString());
+			RESULT=new FineElement(a);
+         :} PathSequenceS
+         {: 
+			System.out.println("PathAlternative");
+         
+         :} ;  
+    PathSequenceS ::= PathSequences
+	    |
+	    %prec PIPE;
+         
+	PathSequences  ::= PIPE PathSequence:a
+         {: 
+			System.out.println("PathSequenceS");
+
+         :} 
+         |
+           PIPE PathSequence:a PathSequences:b
+         {: 
+			System.out.println("PathSequenceS");
+         
+         
+         :} 
+         | PIPE error:e 
+         {: 
+            parser.report_error("Error in PathSequences, error in pipe delimiter object", null );
+			System.out.println("Error in PathSequences");
+
+         :} 
+         |
+           PIPE error:e  PathSequences
+         {: 
+            parser.report_error("Error in PathSequences, error in middle of pipe delimiter object", null );
+			System.out.println("Error in PathSequences");
+
+         :};  
+
+
+	PathSequence	  ::=  	PathEltOrInverse:a {: 
+
+			System.out.println("PathSequence: "+a.toString());
+			RESULT=new FineElement(a);
+         :} PathEltOrInverseS:b
+         {: 
+			System.out.println("PathSequence");
+
+         :} ;  
+         
+    PathEltOrInverseS  ::= PathEltOrInverses
+    |
+    %prec SLASH;
+    
+	PathEltOrInverses         ::=  SLASH PathEltOrInverse:a
+         {: 
+			System.out.println("PathEltOrInverseS");
+
+         :}
+         |
+          SLASH PathEltOrInverse:b PathEltOrInverses:a
+         {: 
+			System.out.println("PathEltOrInverseS");
+
+         :}
+         | SLASH error:e 
+         {: 
+            parser.report_error("Error in PathEltOrInverses, error in slash delimiter object", null );
+			System.out.println("Error in PathEltOrInverses");
+
+         :} 
+         |
+           SLASH error:e  PathEltOrInverses:a
+         {: 
+            parser.report_error("Error in PathEltOrInverses, error in middle of slash delimiter object", null );
+			System.out.println("Error in PathEltOrInverses");
+
+         :} ;  
+
+
+  	PathElt	  ::=  	PathPrimary:a
+  	 {: 
+			System.out.println("PathElt: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} PathModQ
+         {: 
+			System.out.println("PathElt");
+
+         :} ;  
+	PathModQ                  ::=   PathMod
+         {: 
+			System.out.println("PathModQ");
+
+         :} 
+         |
+         ;
+           
+
+
+  	PathEltOrInverse	  ::=  	PathElt:a
+         {: 
+			System.out.println("PathEltOrInverse: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+	PathEltOrInverse	  ::=  	CARET PathElt:a
+         {: 
+			System.out.println("PathEltOrInverse: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+	PathMod	  ::=  	QMARK
+         {: 
+			System.out.println("PathMod");
+
+         :} ;
+		 
+	PathMod	  ::=  	STAR
+         {: 
+			System.out.println("PathMod");
+
+         :} ;
+		 
+	PathMod	  ::=  	PLUSMARK
+         {: 
+			System.out.println("PathMod");
+
+         :} ;
+
+  	PathPrimary	  ::=  	iri:a
+         {: 
+			System.out.println("PathPrimary: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+	PathPrimary	  ::=  	ISA:a
+         {: 
+			System.out.println("PathPrimary: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;
+	
+	PathPrimary	  ::=  	EMARK PathNegatedPropertySet
+         {: 
+			System.out.println("PathPrimary");
+
+         :} ;
+	
+	PathPrimary	  ::=  	PARENTHO Path PARENTHC
+         {: 
+			System.out.println("PathPrimary");
+
+         :};
+
+	PathNegatedPropertySet	  ::=  	PathOneInPropertySet 
+         {: 
+			System.out.println("PathNegatedPropertySet");
+
+         :} ;  
+	PathNegatedPropertySet	  ::=  	PARENTHO PathOneInPropertySetSQ PARENTHC
+         {: 
+			System.out.println("PathNegatedPropertySet");
+
+         :} ;  
+	PathOneInPropertySetSQ    ::=   PathOneInPropertySet PathOneInPropertySetS
+         {: 
+			System.out.println("PathOneInPropertySetSQ");
+
+         :} |;  
+         
+    PathOneInPropertySetS  ::= PathOneInPropertySets
+	    |
+	    %prec PIPE;
+         
+	PathOneInPropertySets     ::=  PIPE PathOneInPropertySet
+         {: 
+			System.out.println("PathOneInPropertySetS");
+
+         :} 
+         |
+          PathOneInPropertySet PIPE PathOneInPropertySets
+         {: 
+			System.out.println("PathOneInPropertySetS");
+
+         :} ;  
+
+	PathOneInPropertySet	  ::=  	iri iri
+         {: 
+			System.out.println("PathOneInPropertySet");
+         :} ;
+		 
+	PathOneInPropertySet	  ::=  	iri ISA
+         {: 
+			System.out.println("PathOneInPropertySet");
+
+         :} ;
+		 
+	PathOneInPropertySet	  ::=  	ISA iri
+         {: 
+			System.out.println("PathOneInPropertySet");
+
+         :} ;
+		 
+	PathOneInPropertySet	  ::=  	ISA ISA
+         {: 
+			System.out.println("PathOneInPropertySet");
+
+         :} ;
+		 
+	PathOneInPropertySet	  ::=   CARET iri
+         {: 
+			System.out.println("PathOneInPropertySet");
+
+         :} ;
+		 
+	PathOneInPropertySet	  ::=  	CARET ISA
+         {: 
+			System.out.println("PathOneInPropertySet");
+
+         :} ;
+	/*	 ERROR IN THE W3C GRAMMAR : non terminal Integer is not reacheable
+  	Integer	  ::=  	INTEGER
+         {: 
+
+         :} ;  
+
+*/
+  	TriplesNode	  ::=  	Collection
+         {: 
+			System.out.println("TriplesNode");
+
+         :} ;
+
+	TriplesNode	  ::=  	BlankNodePropertyList
+         {: 
+			System.out.println("TriplesNode");
+
+         :} ;
+
+	BlankNodePropertyList	  ::=  	SBRACKETO PropertyListNotEmpty SBRACKETC
+         {: 
+			System.out.println("BlankNodePropertyList");
+
+         :} ;  
+
+
+  	TriplesNodePath	  ::=  	CollectionPath
+         {: 
+			System.out.println("TriplesNodePath");
+
+         :} ;
+		 
+	TriplesNodePath	  ::=  	BlankNodePropertyListPath
+         {: 
+			System.out.println("TriplesNodePath");
+
+         :} ;
+
+
+	BlankNodePropertyListPath	  ::=  	SBRACKETO PropertyListPathNotEmpty SBRACKETC
+         {: 
+			System.out.println("BlankNodePropertyListPath");
+
+         :} ;  
+
+
+	Collection	  ::=  	PARENTHO GraphNodeP PARENTHC
+         {: 
+			System.out.println("Collection");
+
+         :} ;  
+	GraphNodeP        ::=    GraphNode
+         {: 
+			System.out.println("GraphNodeP");
+
+         :} ;  
+	GraphNodeP        ::=   GraphNode GraphNodeP 
+         {: 
+			System.out.println("GraphNodeP");
+
+         :} ;  
+
+
+	CollectionPath	  ::=  	PARENTHO GraphNodePathP PARENTHC
+         {: 
+			System.out.println("CollectionPath");
+
+         :} ;  
+	GraphNodePathP    ::=    GraphNodePath
+         {: 
+			System.out.println("GraphNodePathP");
+
+         :} ;  
+	GraphNodePathP    ::=  GraphNodePath GraphNodePathP 
+         {: 
+			System.out.println("GraphNodePathP");
+
+         :} ;  
+
+
+  	GraphNode	  ::=  	VarOrTerm
+         {: 
+			System.out.println("GraphNode");
+
+         :} ;
+
+	GraphNode	  ::=  	TriplesNode
+         {: 
+			System.out.println("GraphNode");
+
+         :} ;
+
+  	GraphNodePath	  ::=  	VarOrTerm:a
+         {: 
+         
+			System.out.println("GraphNodePath: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+	GraphNodePath	  ::=  	TriplesNodePath
+         {: 
+			System.out.println("GraphNodePath");
+         
+
+         :} ;
+
+  	VarOrTerm	  ::=  	Var:a
+         {: 
+			System.out.println("VARORTERM: "+a.getContent());
+			RESULT=new FineElement(a);
+
+         :} ;
+         
+	
+	VarOrTerm	  ::=  	GraphTerm:a
+         {: 
+			System.out.println("VarOrTerm: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+  	VarOrIri	  ::=  	Var:a
+         {: 
+			System.out.println("VARORIRI: "+a.toString());
+
+         :} ;
+	
+	VarOrIri	  ::=  	iri
+         {: 
+			System.out.println("VarOrIri");
+
+         :} ;
+
+  	Var	  ::=  	VAR1:v1
+         {: 
+            if (tempStr.contains(v1.toString())){
+            
+            }
+            else {
+            
+		     	SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+				FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            	tempTot.add(nut);
+            	tempStr.add(v1.toString());
+            }
+         
+         	RESULT=new FineElement(v1.toString(),"VARIABLE");
+			System.out.println("VAR1: "+v1.toString());
+         :} ;
+	
+	Var	  ::=  	VAR2:v2
+         {: 
+         	if (tempStr.contains(v2.toString())){
+            
+            }
+            else {
+		     	SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+				FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            	tempTot.add(nut);
+            	tempStr.add(v2.toString());
+            }
+         	RESULT=new FineElement(v2.toString(),"VARIABLE");
+			System.out.println("VAR2: "+v2.toString());
+
+         :} ;  
+
+  	GraphTerm	  ::=  	iri:a
+         {: 
+			System.out.println("GraphTerm "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	GraphTerm	  ::=  	RDFLiteral:a
+         {: 
+			System.out.println("GraphTerm: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	GraphTerm	  ::=  	NumericLiteral:a
+         {: 
+			System.out.println("GraphTerm: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	GraphTerm	  ::=  	BooleanLiteral
+         {: 
+			System.out.println("GraphTerm");
+
+         :} ;
+		 
+	GraphTerm	  ::=  	BlankNode
+         {: 
+			System.out.println("GraphTerm");
+
+         :} ;
+		 
+	GraphTerm	  ::=  	NIL
+         {: 
+			System.out.println("GraphTerm");
+
+         :} ;
+
+
+  	Expression	  ::=  	ConditionalOrExpression
+         {: 
+			System.out.println("Expression");
+
+         :} ;  
+
+
+	ConditionalOrExpression	  ::=  	ConditionalAndExpression ConditionalAndExpressionS
+         {: 
+			System.out.println("ConditionalOrExpression");
+
+         :} ;  
+         
+    ConditionalAndExpressionS  ::= ConditionalAndExpressions
+    |
+    %prec DOUBLEPIPE;
+    
+         
+	ConditionalAndExpressions ::=  DOUBLEPIPE ConditionalAndExpression
+         {: 
+			System.out.println("ConditionalAndExpressionS");
+
+         :} 
+         | ConditionalAndExpression  DOUBLEPIPE ConditionalAndExpressions
+         {: 
+			System.out.println("ConditionalAndExpressionS");
+
+         :} ;  
+
+
+	ConditionalAndExpression	  ::=  	ValueLogical ValueLogicalS
+         {: 
+			System.out.println("ConditionalAndExpression");
+
+         :} 
+         ;  
+         
+    ValueLogicalS  ::= ValueLogicals
+	    |
+	    %prec DOUBLEAMPERSAND;
+    
+         
+	ValueLogicals     ::=   DOUBLEAMPERSAND ValueLogical
+         {: 
+			System.out.println("ValueLogicalS");
+
+         :} 
+         |
+            DOUBLEAMPERSAND ValueLogical ValueLogicals
+         {: 
+			System.out.println("ValueLogicalS");
+
+         :}
+         | DOUBLEAMPERSAND error:e 
+         {: 
+            parser.report_error("Error in ValueLogicals, error in DOUBLEAMPERSAND delimiter object", null );
+			System.out.println("Error in ValueLogicals");
+
+         :} 
+         |
+           DOUBLEAMPERSAND error:e  ValueLogicals
+         {: 
+            parser.report_error("Error in ValueLogicals, error in middle of DOUBLEAMPERSAND delimiter object", null );
+			System.out.println("Error in ValueLogicals");
+
+         :} ;   
+
+
+  	ValueLogical	  ::=  	RelationalExpression
+         {: 
+			System.out.println("ValueLogical");
+
+         :} ;  
+
+
+	RelationalExpression	  ::=  	NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+		 		 
+	RelationalExpression	  ::=  	NumericExpression EQUALMARK NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+	
+	RelationalExpression	  ::=  	NumericExpression DIFFERENT NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+
+	RelationalExpression	  ::=  	NumericExpression LT NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+
+	RelationalExpression	  ::=  	NumericExpression GT NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+		 
+	RelationalExpression	  ::=  	NumericExpression LEQUAL NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+		 
+	RelationalExpression	  ::=  	NumericExpression GEQUAL NumericExpression
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+	
+	RelationalExpression	  ::=  	NumericExpression IN ExpressionList
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+		 
+	RelationalExpression	  ::=  	NOT IN ExpressionList
+         {: 
+			System.out.println("RelationalExpression");
+
+         :} ;
+	 
+  	NumericExpression	  ::=  	AdditiveExpression
+         {: 
+			System.out.println("NumericExpression");
+
+         :} ;  
+    NumericLiteralBoth  ::= NumericLiteralPositive
+    |
+    NumericLiteralNegative
+    ;
+    NumericLiteralUnary ::= NumericLiteralBoth
+    | NumericLiteralUnary STAR UnaryExpression
+    | NumericLiteralUnary SLASH UnaryExpression
+    ;
+
+	AdditiveExpression	  ::=  	MultiplicativeExpression 
+	| AdditiveExpression PLUSMARK MultiplicativeExpression
+	| AdditiveExpression MINUSMARK MultiplicativeExpression
+	| AdditiveExpression NumericLiteralUnary
+         {: 
+			System.out.println("AdditiveExpression");
+
+         :} 
+         %prec PLUSMARK;  
+
+
+	MultiplicativeExpression	  ::=  	UnaryExpression 
+	| MultiplicativeExpression STAR UnaryExpression
+	| MultiplicativeExpression SLASH UnaryExpression
+         {: 
+			System.out.println("MultiplicativeExpression");
+
+         :} 
+         %prec STAR;  
+
+
+  	UnaryExpression	  ::=  	  EMARK PrimaryExpression:a
+         {: 
+			System.out.println("UnaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+	UnaryExpression	  ::=  	  PLUSMARK PrimaryExpression:a
+         {: 
+			System.out.println("UnaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	UnaryExpression	  ::=  	  MINUSMARK PrimaryExpression:a
+         {: 
+			System.out.println("UnaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+         :} ;
+		 
+	UnaryExpression	  ::=  	  PrimaryExpression:a
+         {: 
+			System.out.println("UnaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+ 
+	PrimaryExpression	  ::=  	BrackettedExpression:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	PrimaryExpression	  ::=  	BuiltInCall:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	PrimaryExpression	  ::=  	iriOrFunction:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	PrimaryExpression	  ::=  	RDFLiteral:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	PrimaryExpression	  ::=  	NumericLiteral:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	PrimaryExpression	  ::=  	BooleanLiteral:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	PrimaryExpression	  ::=  	Var:a
+         {: 
+			System.out.println("PrimaryExpression: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+		 
+	BrackettedExpression	  ::=  	PARENTHO Expression PARENTHC
+         {: 
+			System.out.println("BrackettedExpression");
+
+         :} ;  
+
+
+	BuiltInCall	  ::=  	  Aggregate 
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> Aggregate: Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> Aggregate: Rule translation not supported in this Demo Version");
+         :} ;
+
+	BuiltInCall	  ::=  	  STR PARENTHO Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> STR(Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> STR(Expression): Rule translation not supported in this Demo Version");
+         :} ;
+
+	BuiltInCall	  ::=  	  COALESCE ExpressionList
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> COALESCE ExpressionList: Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> COALESCE ExpressionList: Rule translation not supported in this Demo Version");
+         :} ;
+		 
+	BuiltInCall	  ::=  	  IF PARENTHO Expression COMMA Expression COMMA Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> IF (Expression,Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> IF (Expression,Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;
+		 
+	BuiltInCall	  ::=  	  STRLANG PARENTHO Expression COMMA Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> STRLANG(Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> STRLANG(Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	
+	BuiltInCall	  ::=  	  STRDT PARENTHO Expression COMMA Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> STRDT(Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> STRDT(Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	
+	BuiltInCall	  ::=  	  SAMETERM PARENTHO Expression COMMA Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> SAMETERM(Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> SAMETERM(Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;
+
+	BuiltInCall	  ::=  	  ISIRI PARENTHO Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall ->  ISIRI(Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> ISIRI(Expression): Rule translation not supported in this Demo Version");
+         :} ;
+		 
+	BuiltInCall	  ::=  	  ISURI PARENTHO Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall ->  ISURI(Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> ISURI(Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	
+	BuiltInCall	  ::=  	  ISBLANK PARENTHO Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> ISBLANK(Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> ISBLANK(Expression): Rule translation not supported in this Demo Version");
+         :} ;
+		 
+	BuiltInCall	  ::=  	  ISLITERAL PARENTHO Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> ISLITERAL(Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> ISLITERAL(Expression): Rule translation not supported in this Demo Version");
+         :} ;
+		 
+	BuiltInCall	  ::=  	  ISNUMERIC PARENTHO Expression PARENTHC
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> ISNUMERIC(Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> ISNUMERIC(Expression): Rule translation not supported in this Demo Version");
+         :} ;
+		 
+	BuiltInCall	  ::=  	  RegexExpression
+		{:	
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("BuiltInCall -> RegexExpression: Rule translation not supported in this Demo Version", nut );
+			System.out.println("BuiltInCall -> RegexExpression: Rule translation not supported in this Demo Version");
+         :} ;
+
+  	RegexExpression	  ::=  	REGEX PARENTHO Expression COMMA Expression COMMA Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("RegexExpression -> REGEX(Expression,Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("RegexExpression -> REGEX(Expression,Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;
+
+	RegexExpression	  ::=  	REGEX PARENTHO Expression COMMA Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("RegexExpression -> REGEX(Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("RegexExpression -> REGEX(Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;  
+
+  	SubstringExpression	  ::=  	SUBSTR PARENTHO Expression COMMA Expression COMMA Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("SubstringExpression -> SUBSTR(Expression,Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("SubstringExpression -> SUBSTR(Expression,Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;  
+		 
+	SubstringExpression	  ::=  	SUBSTR PARENTHO Expression COMMA Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("SubstringExpression -> SUBSTR(Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("SubstringExpression -> SUBSTR(Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;  
+
+  	StrReplaceExpression	  ::=  	REPLACE PARENTHO Expression COMMA Expression COMMA Expression COMMA Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("StrReplaceExpression -> REPLACE(Expression,Expression,Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("StrReplaceExpression -> REPLACE(Expression,Expression,Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;  
+
+	StrReplaceExpression	  ::=  	REPLACE PARENTHO Expression COMMA Expression COMMA Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("StrReplaceExpression -> REPLACE(Expression,Expression,Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("StrReplaceExpression -> REPLACE(Expression,Expression,Expression): Rule translation not supported in this Demo Version");
+         :} ;  
+
+	Aggregate	  ::=  	  COUNT PARENTHO DISTINCTQ  STAR  PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate -> COUNT(DISTINCT? *): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> COUNT(DISTINCT? *): Rule translation not supported in this Demo Version");
+         :} ;
+	Aggregate	  ::=  	  COUNT PARENTHO DISTINCTQ  Expression  PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate -> COUNT(DISTINCT? Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> COUNT(DISTINCT? Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	Aggregate	  ::=  	  SUM PARENTHO DISTINCTQ Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate -> SUM(DISTINCT? Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> SUM(DISTINCT? Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	Aggregate	  ::=  	  MIN PARENTHO DISTINCTQ Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate -> MIN(DISTINCT? Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> MIN(DISTINCT? Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	Aggregate	  ::=  	   MAX PARENTHO DISTINCTQ Expression PARENTHC 
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate -> MAX(DISTINCT? Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> MAX(DISTINCT? Expression): Rule translation not supported in this Demo Version");
+         :} ;
+	Aggregate	  ::=  	  AVG PARENTHO DISTINCTQ Expression PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate -> AVG(DISTINCT? Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> AVG(DISTINCT? Expression): Rule translation not supported in this Demo Version");
+			
+
+         :} ;
+
+	Aggregate	  ::=  	  GROUP_CONCAT PARENTHO DISTINCTQ Expression  SEMICOLON SEPARATOR EQUALMARK String  PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate ->  GROUP_CONCAT(DISTINCT? Expression;SEPARATOR = String): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate ->  GROUP_CONCAT(DISTINCT? Expression;SEPARATOR = String): Rule translation not supported in this Demo Version");
+			
+         :} ;
+	Aggregate	  ::=  	  GROUP_CONCAT PARENTHO DISTINCTQ Expression  PARENTHC
+         {: 
+		    SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+			FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+			parser.report_error("Aggregate ->  GROUP_CONCAT(DISTINCT? Expression): Rule translation not supported in this Demo Version", nut );
+			System.out.println("Aggregate -> GROUP_CONCAT(DISTINCT? Expression): Rule translation not supported in this Demo Version");
+			
+         :} ;
+		 
+
+
+
+
+  	iriOrFunction	  ::=  	iri:a
+         {: 
+			System.out.println("iriOrFunction");
+			System.out.println(a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+
+	iriOrFunction	  ::=  	iri:a ArgList
+         {: 
+			System.out.println("iriOrFunction");
+			System.out.println(a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;		 
+
+	RDFLiteral	  ::=  	String:l 
+         {: 
+
+			System.out.println("rdfliteral "+l.toString());
+			RESULT=new FineElement(l);
+
+         :}  LANGTAG ;  
+	RDFLiteral	  ::=  	String:l 
+         {: 
+
+			System.out.println("rdfliteral "+l.toString());
+			RESULT=new FineElement(l);
+
+         :}  CARETCARET iri
+         {: 
+			System.out.println("iriOrFunction");
+
+         :} ;  
+		 
+	RDFLiteral	  ::=  	String:l
+         {: 
+
+			System.out.println("rdfliteral "+l.toString());
+			RESULT=new FineElement(l);
+
+         :}  ;
+	
+
+  	NumericLiteral	  ::=  	NumericLiteralUnsigned:a
+         {: 
+
+			System.out.println("NumericLiteral: "+a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+	
+	NumericLiteral	  ::=  	NumericLiteralPositive:a
+         {: 
+
+			System.out.println("NumericLiteral: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+         :} ;
+	
+	NumericLiteral	  ::=  	NumericLiteralNegative:a
+         {: 
+			System.out.println("NumericLiteral: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;		 
+
+  	NumericLiteralUnsigned	  ::=  	INTEGER:a
+         {: 
+
+			System.out.println("NumericLiteralUnsigned: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+         :} ;
+
+	NumericLiteralUnsigned	  ::=  	DECIMAL:a
+         {: 
+			System.out.println("NumericLiteralUnsigned: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;
+
+	NumericLiteralUnsigned	  ::=  	DOUBLE:a
+         {: 
+			System.out.println("NumericLiteralUnsigned: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;		 
+
+  	NumericLiteralPositive	  ::=  	INTEGER_POSITIVE:a
+         {: 
+
+			System.out.println("NumericLiteralPositive: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+         :} ;
+	
+	NumericLiteralPositive	  ::=  	DECIMAL_POSITIVE:a
+         {: 
+			System.out.println("NumericLiteralPositive: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;
+		 
+	NumericLiteralPositive	  ::=  	DOUBLE_POSITIVE:a
+         {: 
+
+			System.out.println("NumericLiteralPositive: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+         :} ;
+			
+	NumericLiteralNegative	  ::=  	INTEGER_NEGATIVE:a
+         {: 
+			System.out.println("NumericLiteralNegative: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;
+
+	NumericLiteralNegative	  ::=  	DECIMAL_NEGATIVE:a
+         {: 
+			System.out.println("NumericLiteralNegative: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;  
+
+	NumericLiteralNegative	  ::=  	DOUBLE_NEGATIVE:a
+         {: 
+			System.out.println("NumericLiteralNegative: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;  		 
+
+  	BooleanLiteral	  ::=  	TRUE
+         {: 
+
+			System.out.println("BooleanLiteral TRUE");
+			RESULT=new FineElement("true","WORD");
+         :} ;
+
+	BooleanLiteral	  ::=  	FALSE
+         {: 
+
+			System.out.println("BooleanLiteral FALSE");
+			RESULT=new FineElement("false","WORD");
+         :} ;  		 
+
+  	String	  ::=  	STRING_LITERAL1:l
+         {: 
+
+			System.out.println(l.toString());
+			RESULT=new FineElement(l.toString(),"WORD");
+         :} ;  
+
+	String	  ::=  	STRING_LITERAL2:l
+         {: 
+
+			System.out.println("literal "+l.toString());
+			RESULT=new FineElement(l.toString(),"WORD");
+         :} ;  
+	
+	String	  ::=  	STRING_LITERAL_LONG1:l
+         {: 
+
+			System.out.println(l.toString());
+			RESULT=new FineElement(l.toString(),"WORD");
+
+         :} ;  
+	
+	String	  ::=  	STRING_LITERAL_LONG2:l
+         {: 
+
+			System.out.println(l.toString());
+			RESULT=new FineElement(l.toString(),"WORD");
+
+         :} ;  
+  	iri	  ::=  	IRIREF:a
+         {: 
+			System.out.println("iri: "+a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+         :} ;
+	iri	  ::=	PrefixedName:a
+		{: 
+
+			System.out.println(a.toString());
+			RESULT=new FineElement(a);
+
+         :} ;
+  	PrefixedName	  ::=  	PNAME_LN:a
+         {: 
+			String PNAME_NSa = a.toString().substring(0,(a.toString().indexOf(":")+1));
+            if (tempPreStr.contains(PNAME_NSa)){
+            
+            }
+            else {
+            
+		     	SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+				FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            	tempPreTot.add(nut);
+            	tempPreStr.add(PNAME_NSa);
+            	System.out.println("prefix vector updated");
+            }
+			System.out.println(a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+			
+         :} ;
+	PrefixedName	  ::=   PNAME_NS:a
+		{: 
+			
+            if (tempPreStr.contains(a.toString())){
+            
+            }
+            else {
+            
+		     	SparqlLexer scan= (SparqlLexer)CUP$SparqlCup$parser.getScanner();
+				FakeError nut = new FakeError(scan.getLine(),scan.getColumn(),scan.getWord(),scan.getCurrentPos(),scan.getBuffer());
+            	tempPreTot.add(nut);
+            	tempPreStr.add(a.toString());
+            	System.out.println("prefix vector updated");
+            }
+            
+			System.out.println(a.toString());
+			RESULT=new FineElement(a.toString(),"WORD");
+
+         :} ;

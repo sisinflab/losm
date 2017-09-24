@@ -1,4 +1,4 @@
-package it.poliba.sisinflab.semanticweb.lod.losm.sparqlToRest;
+package sparqlToRest;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +20,7 @@ import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xml.internal.utils.URI;
 
-import it.poliba.sisinflab.semanticweb.lod.losm.sparl.OSMWrapperAPI;
+import sparql.OSMWrapperAPI;
 
 /**
  * Servlet implementation class Resource
